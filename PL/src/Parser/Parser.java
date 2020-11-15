@@ -55,6 +55,9 @@ public class Parser{
 	        consume(t, TokenType.RPAREN);
 	    }else if (t.peek().getType().equals(TokenType.NOT)){
 			consume(t, TokenType.NOT);
+			BExpr btemp = parseBExpr(t);
+			if (btemp.nodeType().equals("num"))
+				throw new SyntaxError("Cannot assign not to a number on line " + t.lineNumber());
 			b1 = new BExpr(parseBExpr(t));
 	    }else if (t.peek().isBool()) {
 	    	boolean value = t.peek().getType() == TokenType.TRUE;
@@ -66,7 +69,7 @@ public class Parser{
 	    }else if (t.peek().isNum()) {
 	    	b1 = parseAExpr(t);
 	    }else{
-	      throw new SyntaxError("Boolean Paren or Values fail");
+	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
 		};
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
 			if (paren_count <= 0)
@@ -74,10 +77,12 @@ public class Parser{
 		}
 		else if (t.peek().getType().equals(TokenType.AND)) {
 			consume(t, TokenType.AND);
-			b1 = new BExpr(b1, ExprOperator.AND, parseBExpr(t));
+			errOnNumber(t,b1);
+			b1 = new BExpr(b1, ExprOperator.AND, errOnNumber(t, parseBExpr(t)));
 		} else if (t.peek().getType().equals(TokenType.OR)){
 			consume(t, TokenType.OR);
-			b1 = new BExpr(b1, ExprOperator.OR, parseBExpr(t));
+			errOnNumber(t,b1);
+			b1 = new BExpr(b1, ExprOperator.OR, errOnNumber(t, parseBExpr(t)));
 		} else if (t.peek().getType().equals(TokenType.EQ)){
 			consume(t, TokenType.EQ);
 			b1 = new BExpr(b1, ExprOperator.EQ, parseBExpr(t));
@@ -97,11 +102,18 @@ public class Parser{
 			consume(t, TokenType.LTE);
 			b1 = new BExpr(b1, ExprOperator.LTE, parseBExpr(t));
 		}else if (t.hasNext()){
-		  throw new SyntaxError("Boolean binop fails");
+		  throw new SyntaxError("Boolean binop failed on line " + t.lineNumber());
 		    }
 		
 	    return b1;
 	  }
+	
+	// Throws error if b is a NUM, otherwise does nothing
+	private static BExpr errOnNumber(Tokenizer t, BExpr b) throws SyntaxError {
+		if (b.nodeType().equals("num"))
+			throw new SyntaxError("Cannot assign not to a number on line " + t.lineNumber());
+		return b;
+	}
 	
 	public static AExpr parseAExpr(Tokenizer t) throws SyntaxError{
 		AExpr a1;
@@ -116,12 +128,12 @@ public class Parser{
 				a1 = new Number(value);
 	      consume(t, TokenType.NUM);
 	    }else{
-	      throw new SyntaxError("Arith Paren or Values fail");
+	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};
 		
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
 			if (paren_count <= 0)
-				throw new SyntaxError("Parenthesis Mismatch");
+				throw new SyntaxError("Parenthesis Mismatch on line " + t.lineNumber());
 		}
 		else if (t.peek().getType().equals(TokenType.PLUS)) {
 				consume(t, TokenType.PLUS);

@@ -32,4 +32,9 @@ public class Number extends AExpr {
 		sb.append(toString());
 		return sb;
 	} 
+	
+	@Override
+	public String nodeType() {
+		return "num";
+	}
 }

@@ -15,6 +15,16 @@ not T or F --> not (T or F)
 T is for true and F for false.
 
 # Status
-Currently we have a basic lexer and parser working for integers and booleans, including basic operations. Some examples of how files are parsed are shown below. Note the bracket is merely a substitute for the actual AST representation:
+Currently we have a basic lexer and parser working for integers and booleans, including basic operations. Some examples of how files are parsed (including incorrect grammar) are shown below. Note the bracket is merely a substitute for the actual AST representation:
 ```
-3 * 4 + 2 - 1 + 0 --> {3 * {4 + {2 - {1 + 0}}}}
+T and (1 + 3) == 4 + 3 --> true and ((1 + 3) == (4 + 3))
+```
+```
+3 * 4 + 2 - 1 + 0 --> 3 * (4 + (2 - (1 + 0)))
+```
+```
+3 + T --> Parser.SyntaxError: Assigning Arithmetic Values failed on line 1
+```
+```
+F or T) --> Parser.SyntaxError: Parenthesis Mismatch
+```

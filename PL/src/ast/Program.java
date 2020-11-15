@@ -38,10 +38,10 @@ public class Program extends AbstractNode {
 	
 	@Override
 	public StringBuilder prettyPrint(StringBuilder sb) {
-		sb.append("(");
+//		sb.append("(");
 		for (Expr e : children)
 			e.prettyPrint(sb);
-		sb.append(")");
+//		sb.append(")");
 		return sb;
 	}
 	

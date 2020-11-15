@@ -47,13 +47,16 @@ public class BExpr extends Expr{
 	
 	@Override
 	public StringBuilder prettyPrint(StringBuilder sb) {
-		sb.append("{");
+		sb.append("(");
 		if (left != null)
 			left.prettyPrint(sb);
 		sb.append(" " + operator.toString() + " ");
 		right.prettyPrint(sb);
-		sb.append("}");
+		sb.append(")");
 		return sb;
 	} 
-
+	
+	public String nodeType() {
+		return "BExpr";
+	}
 }

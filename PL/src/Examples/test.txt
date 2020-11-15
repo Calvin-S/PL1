@@ -1,1 +1,0 @@
-T and not F or T or ( (1 + 3) == 4 + 3)

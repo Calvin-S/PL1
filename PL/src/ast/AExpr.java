@@ -40,12 +40,17 @@ public class AExpr extends BExpr{
 	
 	@Override
 	public StringBuilder prettyPrint(StringBuilder sb) {
-		sb.append("{");
+		sb.append("(");
 		left.prettyPrint(sb);
 		sb.append(" " + operator.toString() + " ");
 		right.prettyPrint(sb);
-		sb.append("}");
+		sb.append(")");
 		return sb;
 	} 
+	
+	@Override
+	public String nodeType() {
+		return "AExpr";
+	}
 
 }

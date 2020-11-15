@@ -8,7 +8,7 @@ import ast.Program;
 
 public class Main {
 	public static void main(String args[]) {
-		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test5.txt");
+		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test0.txt");
 		Reader r = new BufferedReader(new InputStreamReader(in));
 		
 		Parser parser = new Parser();
