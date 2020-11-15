@@ -73,7 +73,6 @@ public enum TokenType {
 
     /**
      * Returns this {@code TokenType}'s category.
-     *
      * @return this {@code TokenType}'s category
      */
     public TC category() {

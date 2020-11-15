@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** A representation of a binary operation between two expressions. */
-public class AExpr extends Expr{
+public class AExpr extends BExpr{
 
 	private Expr.ExprOperator operator;
 	private AExpr left, right;

@@ -9,16 +9,11 @@ import ast.*;
 import ast.Expr.ExprOperator;
 import ast.Number;
 
-class Parser{
+public class Parser{
 
-	public static void main(String[] args) {
-		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test.txt");
-		Reader r = new BufferedReader(new InputStreamReader(in));
-		
-		Parser parser = new Parser();
-		Program prog = parser.parse(r);
-		System.out.println(prog);
-	}
+//	public static void main(String[] args) {
+//		
+//	}
 
 	public Program parse(Reader r) {
 		Tokenizer t = new Tokenizer(r);
@@ -49,6 +44,7 @@ class Parser{
 	  }
 	
 	static int paren_count = 0;
+	
 	public static BExpr parseBExpr(Tokenizer t) throws SyntaxError{
 		BExpr b1;
 	    if(t.peek().getType().equals(TokenType.LPAREN)){
@@ -57,6 +53,9 @@ class Parser{
 	        b1 = parseBExpr(t);
 	        paren_count--;
 	        consume(t, TokenType.RPAREN);
+	    }else if (t.peek().getType().equals(TokenType.NOT)){
+			consume(t, TokenType.NOT);
+			b1 = new BExpr(parseBExpr(t));
 	    }else if (t.peek().isBool()) {
 	    	boolean value = t.peek().getType() == TokenType.TRUE;
 			b1 = new Bool(value);
@@ -64,6 +63,8 @@ class Parser{
 				consume(t, TokenType.TRUE);
 			else 
 				consume(t, TokenType.FALSE);
+	    }else if (t.peek().isNum()) {
+	    	b1 = parseAExpr(t);
 	    }else{
 	      throw new SyntaxError("Boolean Paren or Values fail");
 		};
@@ -83,10 +84,19 @@ class Parser{
 		} else if (t.peek().getType().equals(TokenType.NEQ)){
 			consume(t, TokenType.NEQ);
 			b1 = new BExpr(b1, ExprOperator.NEQ, parseBExpr(t));
-		} else if (t.peek().getType().equals(TokenType.NOT)){
-			consume(t, TokenType.NOT);
-			b1 = new BExpr(parseBExpr(t));
-		} else if (t.hasNext()){
+		} else if (t.peek().getType().equals(TokenType.GT)){
+			consume(t, TokenType.GT);
+			b1 = new BExpr(b1, ExprOperator.GT, parseBExpr(t));
+		} else if (t.peek().getType().equals(TokenType.LT)){
+			consume(t, TokenType.LT);
+			b1 = new BExpr(b1, ExprOperator.LT, parseBExpr(t));
+		} else if (t.peek().getType().equals(TokenType.GTE)){
+			consume(t, TokenType.GTE);
+			b1 = new BExpr(b1, ExprOperator.GTE, parseBExpr(t));
+		} else if (t.peek().getType().equals(TokenType.LTE)){
+			consume(t, TokenType.LTE);
+			b1 = new BExpr(b1, ExprOperator.LTE, parseBExpr(t));
+		}else if (t.hasNext()){
 		  throw new SyntaxError("Boolean binop fails");
 		    }
 		
@@ -128,10 +138,7 @@ class Parser{
 		} else if (t.peek().getType().equals(TokenType.EXP)){
 		  consume(t, TokenType.EXP);
 				a1 = new AExpr(a1, ExprOperator.EXP, parseAExpr(t));
-		} else if (t.hasNext()){
-		  throw new SyntaxError("Arith Binop fails");
-		    }
-		
+		} 
 	    return a1;
 	  }
 

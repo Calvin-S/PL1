@@ -7,7 +7,7 @@ import java.util.List;
 public class BExpr extends Expr{
 	
 	private ExprOperator operator;
-	private BExpr left, right;
+	private Expr left, right;
 
 	protected BExpr() {} // For bool
 	
@@ -28,7 +28,7 @@ public class BExpr extends Expr{
 		operator = op;
 		right = r;
     }
-	
+
 
 	public List<Node> getChildren() {
 		List<Node> children = new ArrayList<Node>();
@@ -48,7 +48,8 @@ public class BExpr extends Expr{
 	@Override
 	public StringBuilder prettyPrint(StringBuilder sb) {
 		sb.append("{");
-		left.prettyPrint(sb);
+		if (left != null)
+			left.prettyPrint(sb);
 		sb.append(" " + operator.toString() + " ");
 		right.prettyPrint(sb);
 		sb.append("}");

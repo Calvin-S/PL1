@@ -171,6 +171,9 @@ public class Tokenizer implements Iterator<Token> {
 		case 'a':
 			consume("nd", "Expected and", TokenType.AND);
 			break;
+		case 'n':
+			consume("ot", "Expected not", TokenType.NOT);
+			break;
 		default:
 			if (Character.isLetter(c))
 				lexKeyword(c);
@@ -185,21 +188,21 @@ public class Tokenizer implements Iterator<Token> {
 		int index = 0;
 		boolean matched = false;
 		while (index < next.length()) {
-			if (next.charAt(index) != in.peek(index++)) {
+			if ( next.charAt(index) != in.peek(index++)) {
 				addErrorToken(String.format(error));
 				return;
 			}
 		}
 		in.next();
-		consume('d',peeked);
+		consume(next.charAt(next.length() - 1),peeked);
 	}
 	
 	private void lexEq() throws IOException {
 		if (in.peek() == '=') {
 			in.next();
-			addToken(TokenType.NEQ);
-		} else {
 			addToken(TokenType.EQ);
+		} else {
+			addErrorToken(String.format("equals?"));
 		}
 	}
 
@@ -305,7 +308,7 @@ public class Tokenizer implements Iterator<Token> {
 	 * @param tokenType the type of the token to pushed, not {@code null}
 	 */
 	private void addToken(TokenType tokenType) {
-		System.out.println(tokenType);
+//		System.out.println(tokenType);
 		tokens.add(new Token(tokenType, lineNumber));
 	}
 
