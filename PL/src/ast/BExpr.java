@@ -3,13 +3,19 @@ package ast;
 import java.util.ArrayList;
 import java.util.List;
 
-/** A representation of a binary operation between two expressions. */
-public class AExpr extends Expr{
 
-	private Expr.ExprOperator operator;
-	private AExpr left, right;
+public class BExpr extends Expr{
+	
+	private ExprOperator operator;
+	private BExpr left, right;
 
-	protected AExpr() {} // For a number
+	protected BExpr() {} // For bool
+	
+	public BExpr(BExpr not) {
+		operator = ExprOperator.NOT;
+		right = not;
+		left = null;
+	}
     /**
 	 * Create an AST representation of l op r.
 	 *
@@ -17,11 +23,12 @@ public class AExpr extends Expr{
 	 * @param op The binary expression operation.
 	 * @param r  The expression to the right of the op.
 	 */
-	public AExpr(AExpr l, Expr.ExprOperator op, AExpr r) {
+	public BExpr(BExpr l, ExprOperator op, BExpr r) {
 		left = l;
 		operator = op;
 		right = r;
     }
+	
 
 	public List<Node> getChildren() {
 		List<Node> children = new ArrayList<Node>();

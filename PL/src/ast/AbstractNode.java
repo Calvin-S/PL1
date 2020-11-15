@@ -9,7 +9,7 @@ public abstract class AbstractNode implements Node {
 	@Override
 	public int size() {
 		int size = 1;
-		List<Node> children = getChildren();
+		List<Node> children = getChildren( );
 		for (Node child : children) {
 			size += child.size();
 		}
@@ -43,24 +43,19 @@ public abstract class AbstractNode implements Node {
 	public List<Node> getChildren() {
 		return new ArrayList<Node>();
 	}
-
-	public Node getParent(Node tree, Node toFind) {
-		if (tree == toFind) {
-			return parent;
-		}
-
-		Node current = tree;
-		if (!(current.getChildren().isEmpty())) {
-			for (Node child : current.getChildren()) {
-				if (toFind == child) {
-					parent = current;
-				} else {
-					getParent(child, toFind);
-				}
-			}
-		}
-
+	
+	@Override
+	public Node getChild(int i) {
+		return getChildren().get(i);
+	}
+	
+	@Override
+	public void setParent(Node p) {
+		parent = p;
+	}
+	
+	@Override
+	public Node getParent() {
 		return parent;
 	}
-
 }

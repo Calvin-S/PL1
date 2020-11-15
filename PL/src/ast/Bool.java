@@ -1,26 +1,24 @@
 package ast;
 
-/** A representation of the <Number> node. */
-public class Number extends AExpr {
-
-	private int value;
+public class Bool extends BExpr{
+	private boolean value;
 
 	/**
 	 * Creates a new Number representing the value of v.
 	 * 
 	 * @param v The value the Number represents.
 	 */
-	public Number(int v) {
+	public Bool(boolean v) {
 		super();
 		value = v;
 	}
 
-	public int getNum() {
+	public boolean getBool() {
 		return value;
 	}
 
-	public Number clone() {
-		return new Number(value);
+	public Bool clone() {
+		return new Bool(value);
 	}
 
 	public String toString() {
