@@ -4,6 +4,8 @@ import java.io.Reader;
 
 import Parser.Parser;
 import ast.Program;
+import interpreter.Interpreter;
+import interpreter.Value;
 
 public class Main {
 	public static void main(String args[]) {
@@ -14,5 +16,10 @@ public class Main {
 		Parser parser = new Parser();
 		Program prog = parser.parse(r);
 		System.out.println(prog);
+
+		Interpreter i = new Interpreter();
+		Value v = i.evaluateProg(prog);
+		System.out.println(v.toString());
+
 	}
 }

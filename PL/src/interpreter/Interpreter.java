@@ -1,108 +1,203 @@
 package interpreter;
 
-import java.util.Random;
+import java.util.List;
 
-import Dijkstra.ShortestPath;
+import Parser.SyntaxError;
 import ast.BExpr;
-import ast.Mem;
-import ast.Negative;
 import ast.Node;
 import ast.Number;
-import model.Critter;
-import model.Food;
-import model.Rock;
-import sun.management.Sensor;
+import ast.Program;
 
 public class Interpreter {
 
 	public Interpreter() {
-
 	}
 
-	public int evaluateBExpr(BExpr b) {
+	public Value evaluateProg(Program p) throws SyntaxError {
 
-		if (b.getOperator().equals("not")) {
-			return !evaluateBinop(b.getChildren().get(1));
+		List<Node> children = p.getChildren();
 
-		} else {
+		// assuming the only children are exprs, no functions or anything yet.
 
-		}
+		// for(int i = 0; i<children.size(); i++) {
+		// evaluateExpr(children.get(i));
+		// }
+
+		// TEMPORARY
+		return evaluateExpr(children.get(0));
 
 	}
 
 	// evaluates a SINGLE line, not a whole program
-	public int evaluateExpr(Node n) throws Exception {
+	public Value evaluateExpr(Node n) throws SyntaxError {
 
-		if (n instanceof BExpr) {
+		if (n instanceof BExpr) { // this will include AExpr instances right?
 
 			BExpr b = (BExpr) n;
 			return evaluateBExpr(b);
 
 		} else if (n instanceof Number) {
 			Number r = (Number) n;
-			return r.getNum();
-		} else if (n instanceof Mem) {
-			int index = evaluateExpression(n.getChildren().get(0));
-			if (index >= critter.getMemory().length) {
-				return 0;
-			}
-			return critter.getMemory()[index];
+			return new Value(r.getNum());
 
-		} else if (n instanceof Negative) {
-			int num = evaluateExpression(n.getChildren().get(0));
-			return -1 * num;
-		} else if (n instanceof Sensor) {
-			Sensor s = (Sensor) n;
-			if (s.getOperator().equals("nearby")) {
-
-				int index = Math.abs(evaluateExpression(s.getChildren().get(0)) % 6);
-
-				int newDir = (critter.getCurDir() + index) % 6;
-				int[] coord = critter.coordAhead(newDir, 1);
-				Object o = world.getHex(coord[0], coord[1]);
-				if (o == null) {
-					return 0;
-				} else if (o instanceof Critter) {
-					Critter c = (Critter) o;
-					return c.getAppearance(newDir);
-				} else if (o instanceof Food) {
-					return (((Food) o).getTotalEnergy() + 1) * -1;
-				} else if (o instanceof Rock) {
-					return Constants.ROCK_VALUE;
-				}
-			} else if (s.getOperator().equals("ahead")) {
-				int index = evaluateExpression(s.getChildren().get(0));
-				if (index < 0) {
-					index = 0;
-				}
-				int[] coord = critter.coordAhead(critter.getCurDir(), index);
-				Object o = world.getHex(coord[0], coord[1]);
-				if (o == null) {
-					return 0;
-				} else if (o instanceof Critter) {
-					Critter c = (Critter) o;
-					return c.getAppearance(critter.getCurDir());
-				} else if (o instanceof Food) {
-					return (((Food) o).getTotalEnergy() + 1) * -1;
-				} else if (o instanceof Rock) {
-					return Constants.ROCK_VALUE;
-				}
-				// catch weird cases later (ex: index =100 and it goes off the baord
-
-			} else if (s.getOperator().equals("random")) {
-				int index = evaluateExpression(s.getChildren().get(0));
-				if (index < 2) {
-					return 0;
-				}
-				Random r = new Random();
-				return r.nextInt(index);
-			} else if (s.getOperator().equals("smell")) {
-				ShortestPath sp = new ShortestPath(world, critter);
-				return sp.findShortestPath();
-			}
+		} else {
+			throw new SyntaxError("the tree I got cannot be evaluated. Please check me.");
 		}
 
-		throw new Exception();
+	}
+
+	public Value evaluateBExpr(BExpr b) throws SyntaxError {
+
+		if (b.getOperator().equals("not")) {
+			
+			Value v = evaluateExpr(b.getChildren().get(1));
+
+			if (v.getType().equals("bool")) {
+				return new Value(!v.getBool());
+			} else {
+				throw new SyntaxError("calling NOT on something that is not a boolean");
+			}
+
+		} else if (b.getOperator().equals("+")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() + v2.getInt());
+			} else {
+				throw new SyntaxError("trying to add one or more things that are not ints");
+			}
+		} else if (b.getOperator().equals("-")) {
+
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() - v2.getInt());
+			} else {
+				throw new SyntaxError("trying to sub one or more things that are not ints");
+			}
+
+		} else if (b.getOperator().equals("*")) {
+
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() * v2.getInt());
+			} else {
+				throw new SyntaxError("trying to mult one or more things that are not ints");
+			}
+
+		} else if (b.getOperator().equals("/")) {
+
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				if (v2.getInt() != 0) {
+					return new Value(v1.getInt() / v2.getInt());
+				} else {
+					throw new SyntaxError("cannot divide by 0");
+				}
+
+			} else {
+				throw new SyntaxError("trying to div one or more things that are not ints");
+			}
+
+		} else if (b.getOperator().equals("**")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value((int) Math.pow(v1.getInt(), v2.getInt()));
+			} else {
+				throw new SyntaxError("trying to exp one or more things that are not ints");
+			}
+
+		} else if (b.getOperator().equals("and")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("bool") && v2.getType().equals("bool")) {
+				return new Value(v1.getBool() && v2.getBool());
+			} else {
+				throw new SyntaxError("trying to and one or more things that are not bools");
+			}
+		} else if (b.getOperator().equals("or")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("bool") && v2.getType().equals("bool")) {
+				return new Value(v1.getBool() || v2.getBool());
+			} else {
+				throw new SyntaxError("trying to or one or more things that are not bools");
+			}
+		} else if (b.getOperator().equals("==")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("bool") && v2.getType().equals("bool")) {
+				return new Value(v1.getBool() == v2.getBool());
+			} else if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() == v2.getInt());
+			} else if (v1.getType().equals("string") && v2.getType().equals("string")) {
+				return new Value(v1.getString().equals(v2.getString()));
+			} else {
+				throw new SyntaxError("trying to == two things of different or invalid types");
+			}
+		} else if (b.getOperator().equals("!=")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("bool") && v2.getType().equals("bool")) {
+				return new Value(v1.getBool() != v2.getBool());
+			} else if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() != v2.getInt());
+			} else if (v1.getType().equals("string") && v2.getType().equals("string")) {
+				return new Value(!(v1.getString().equals(v2.getString())));
+			} else {
+				throw new SyntaxError("trying to != two things of different or invalid types");
+			}
+		} else if (b.getOperator().equals(">")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() > v2.getInt());
+			} else {
+				throw new SyntaxError("trying to > one or more things that are not int");
+			}
+		} else if (b.getOperator().equals("<")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+			
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() < v2.getInt());
+			} else {
+				throw new SyntaxError("trying to < one or more things that are not int");
+			}
+		} else if (b.getOperator().equals(">=")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+			
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() >= v2.getInt());
+			} else {
+				throw new SyntaxError("trying to >= one or more things that are not int");
+			}
+		} else if (b.getOperator().equals("<=")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+			
+			if (v1.getType().equals("int") && v2.getType().equals("int")) {
+				return new Value(v1.getInt() <= v2.getInt());
+			} else {
+				throw new SyntaxError("trying to <= one or more things that are not int");
+			}
+		} else {
+			throw new SyntaxError("invalid operator");
+		}
 
 	}
 
