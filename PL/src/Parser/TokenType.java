@@ -29,7 +29,14 @@ public enum TokenType {
 	NUM(TC.VALUES, "<number>"),
     TRUE(TC.VALUES, "t"),
     FALSE(TC.VALUES, "f"),
-	
+    
+    IF(TC.COND, "if"),
+    ELIF(TC.COND, "elif"),
+    ELSE(TC.COND, "else"),
+    FOR(TC.COND, "for"),
+    WHILE(TC.COND, "while"),
+    
+	SEMICOLON(TC.OTHER, ";"),
 	LBRACKET(TC.OTHER, "["),
     RBRACKET(TC.OTHER, "]"),
     LPAREN(TC.OTHER, "("),

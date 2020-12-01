@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import ast.*;
-import ast.Binop.ExprOperator;
+import ast.Expr.ExprOperator;
 import ast.Number;
 
 public class Parser{
@@ -37,13 +37,18 @@ public class Parser{
 	public static Program parseProgram(Tokenizer t) throws SyntaxError {
 		Program p = new Program();
 		
-	    Binop e = parseBExpr(t);    //assuming all Exprs are AExprs
+	    Expr e = parseBExpr(t);    //assuming all Exprs are AExprs
 	    p.addNode(e);
   
 		return p;
 	  }
 	
 	static int paren_count = 0;
+	
+	public static Expr parseExpr(Tokenizer t) throws SyntaxError {
+		Expr e1;
+		return e1;
+	}
 	
 	public static BExpr parseBExpr(Tokenizer t) throws SyntaxError{
 		BExpr b1;

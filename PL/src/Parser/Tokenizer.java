@@ -120,6 +120,9 @@ public class Tokenizer implements Iterator<Token> {
 		case LookAheadBuffer.EOF:
 			addEOFToken();
 			break;
+		case ';':
+			addToken(TokenType.SEMICOLON);
+			break;
 		case '[':
 			addToken(TokenType.LBRACKET);
 			break;
@@ -171,9 +174,14 @@ public class Tokenizer implements Iterator<Token> {
 		case 'a':
 			consume("nd", "Expected and", TokenType.AND);
 			break;
+		case 'e':
+			lexE();
+		case 'i':
+			consume('f', TokenType.IF);
 		case 'n':
 			consume("ot", "Expected not", TokenType.NOT);
 			break;
+		
 		default:
 			if (Character.isLetter(c))
 				lexKeyword(c);
@@ -220,7 +228,7 @@ public class Tokenizer implements Iterator<Token> {
 				c = in.scanAndPeek();
 			}
 			lexOneToken();
-		} else { // not a comment
+		} else { // division
 			addToken(TokenType.DIVIDE);
 		}
 	}
@@ -238,6 +246,18 @@ public class Tokenizer implements Iterator<Token> {
 			addToken(TokenType.LTE);
 		} else {
 			addToken(TokenType.LT);
+		}
+	}
+	
+	private void lexE() throws IOException {
+		if (in.peek() == 'l') {
+			in.next();
+			if (in.peek() == 'i')
+				consume("if", "Expected elif", TokenType.ELIF);
+			else if (in.peek() == 's')
+				consume("se", "Expected else", TokenType.ELSE);
+			else
+				addErrorToken(String.format("Expected elif or else"));
 		}
 	}
 

@@ -8,10 +8,10 @@ import java.util.Random;
 /** A data structure representing a critter program. */
 public class Program extends AbstractNode {
 	
-	private ArrayList<Binop> children;
+	private ArrayList<Expr> children;
 
 	public Program() {
-		children = new ArrayList<Binop>();
+		children = new ArrayList<Expr>();
 	}
 
 	/**
@@ -19,13 +19,13 @@ public class Program extends AbstractNode {
 	 * 
 	 * @param r rule to add
 	 */
-	public void addNode(Binop e) {
+	public void addNode(Expr e) {
 		children.add(e);
 	}
 
 	public List<Node> getChildren() {
 		List<Node> children_copy = new ArrayList<Node>();
-		for (Binop e : children) { //note this doesn't actually clone the children
+		for (Expr e : children) { //note this doesn't actually clone the children
 			children_copy.add(e);
 		}
 		return children_copy;
@@ -39,7 +39,7 @@ public class Program extends AbstractNode {
 	@Override
 	public StringBuilder prettyPrint(StringBuilder sb) {
 //		sb.append("(");
-		for (Binop e : children)
+		for (Expr e : children)
 			e.prettyPrint(sb);
 //		sb.append(")");
 		return sb;
