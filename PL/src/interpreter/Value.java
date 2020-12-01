@@ -10,7 +10,7 @@ public class Value {
 
 	public Value(int i) {
 		intVal = i;
-		stringVal = null;
+		stringVal = "";
 		boolVal = false;
 
 		type[0] = 1;
@@ -18,7 +18,7 @@ public class Value {
 
 	public Value(String s) {
 		intVal = 0;
-		stringVal = null;
+		stringVal = "";
 		boolVal = false;
 
 		type[1] = 1;
@@ -26,7 +26,7 @@ public class Value {
 
 	public Value(boolean b) {
 		intVal = 0;
-		stringVal = null;
+		stringVal = "";
 		boolVal = b;
 
 		type[2] = 1;

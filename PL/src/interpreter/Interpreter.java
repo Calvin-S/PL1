@@ -3,10 +3,8 @@ package interpreter;
 import java.util.List;
 
 import Parser.SyntaxError;
-import ast.BExpr;
-import ast.Node;
+import ast.*;
 import ast.Number;
-import ast.Program;
 
 public class Interpreter {
 
@@ -14,7 +12,6 @@ public class Interpreter {
 	}
 
 	public Value evaluateProg(Program p) throws SyntaxError {
-
 		List<Node> children = p.getChildren();
 
 		// assuming the only children are exprs, no functions or anything yet.
@@ -31,14 +28,18 @@ public class Interpreter {
 	// evaluates a SINGLE line, not a whole program
 	public Value evaluateExpr(Node n) throws SyntaxError {
 
-		if (n instanceof BExpr) { // this will include AExpr instances right?
+		if (n instanceof Number) {
+			Number r = (Number) n;
+			return new Value(r.getNum());
+
+		} else if (n instanceof Bool) {
+			Bool r = (Bool) n;
+			return new Value(r.getBool());
+
+		} else if (n instanceof BExpr) { // this will include AExpr instances right?
 
 			BExpr b = (BExpr) n;
 			return evaluateBExpr(b);
-
-		} else if (n instanceof Number) {
-			Number r = (Number) n;
-			return new Value(r.getNum());
 
 		} else {
 			throw new SyntaxError("the tree I got cannot be evaluated. Please check me.");

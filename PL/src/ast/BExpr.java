@@ -38,6 +38,8 @@ public class BExpr extends Expr{
 	}
 
 	public String toString() {
+		if (left == null)
+			return "( " + operator.toString() + " " + right.toString() + " )";
 		return "( " + left.toString() + " " + operator.toString() + " " + right.toString() + " )";
 	}
 

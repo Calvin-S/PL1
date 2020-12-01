@@ -176,8 +176,10 @@ public class Tokenizer implements Iterator<Token> {
 			break;
 		case 'e':
 			lexE();
+			break;
 		case 'i':
 			consume('f', TokenType.IF);
+			break;
 		case 'n':
 			consume("ot", "Expected not", TokenType.NOT);
 			break;
@@ -328,7 +330,7 @@ public class Tokenizer implements Iterator<Token> {
 	 * @param tokenType the type of the token to pushed, not {@code null}
 	 */
 	private void addToken(TokenType tokenType) {
-//		System.out.println(tokenType);
+		System.out.println(tokenType);
 		tokens.add(new Token(tokenType, lineNumber));
 	}
 

@@ -11,10 +11,6 @@ import ast.Number;
 
 public class Parser{
 
-//	public static void main(String[] args) {
-//		
-//	}
-
 	public Program parse(Reader r) {
 		Tokenizer t = new Tokenizer(r);
 		try {
@@ -37,51 +33,88 @@ public class Parser{
 	public static Program parseProgram(Tokenizer t) throws SyntaxError {
 		Program p = new Program();
 		
-	    Expr e = parseBExpr(t);    //assuming all Exprs are AExprs
+	    Expr e = parseExpr(t);    //assuming all Exprs are AExprs
 	    p.addNode(e);
   
 		return p;
 	  }
 	
 	static int paren_count = 0;
+	static int brace_count = 0;
 	
 	public static Expr parseExpr(Tokenizer t) throws SyntaxError {
 		Expr e1;
+		if(t.peek().getType().equals(TokenType.LPAREN)){
+	        consume(t, TokenType.LPAREN);
+	        e1 = parseExpr(t);
+	        consume(t, TokenType.RPAREN);
+	    } else if (t.peek().getType().equals(TokenType.IF)) {
+	    	consume(t, TokenType.IF);
+	    	consume(t, TokenType.LPAREN, "If statement guards need parenthesis");
+	    	BExpr g = parseBExpr(t);
+	    	consume(t, TokenType.RPAREN);
+	    	consume(t, TokenType.LBRACE, "If statements bodies need brackets");
+	    	Expr body = parseExpr(t);
+	    	consume(t, TokenType.RBRACE);
+	    	e1 = new If(g, body);
+	    	while (t.peek().getType().equals(TokenType.ELIF)) {
+	    		if (t.peek().getType().equals(TokenType.ELSE))
+	    			break;
+	    		consume(t, TokenType.ELIF, "Else if statements guards need parenthesis");
+	    		consume(t, TokenType.LPAREN);
+		    	g = parseBExpr(t);
+		    	consume(t, TokenType.RPAREN);
+		    	consume(t, TokenType.LBRACE, "Else if statements bodies need brackets");
+		    	Expr elifBody = parseExpr(t);
+		    	consume(t, TokenType.RBRACE);
+		    	((If) e1).addBranch(g, elifBody);
+	    	}
+	    	if (t.peek().getType().equals(TokenType.ELSE)) {
+	    		consume(t, TokenType.ELSE);
+	    		consume(t, TokenType.LBRACE, "Else statement bodies need brackets");
+		    	Expr elseBody = parseExpr(t);
+		    	consume(t, TokenType.RBRACE);
+	    		((If) e1).addBranch(new Bool(true), elseBody);
+	    	}
+		} else if (t.peek().isBool() || t.peek().getType().equals(TokenType.NOT)) {
+	    	e1 = parseBExpr(t);
+	    } else if (t.peek().isNum()) {
+	    	e1 = parseAExpr(t);
+	    } else{
+	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
+		};
 		return e1;
 	}
 	
 	public static BExpr parseBExpr(Tokenizer t) throws SyntaxError{
 		BExpr b1;
-	    if(t.peek().getType().equals(TokenType.LPAREN)){
+	    if (t.peek().getType().equals(TokenType.LPAREN)){
 	        consume(t, TokenType.LPAREN);
-	        paren_count++;
 	        b1 = parseBExpr(t);
-	        paren_count--;
 	        consume(t, TokenType.RPAREN);
-	    }else if (t.peek().getType().equals(TokenType.NOT)){
+	    } else if (t.peek().getType().equals(TokenType.NOT)){
 			consume(t, TokenType.NOT);
 			BExpr btemp = parseBExpr(t);
 			if (btemp.nodeType().equals("num"))
 				throw new SyntaxError("Cannot assign not to a number on line " + t.lineNumber());
-			b1 = new BExpr(parseBExpr(t));
-	    }else if (t.peek().isBool()) {
+			b1 = new BExpr(btemp);
+	    } else if (t.peek().isBool()) {
 	    	boolean value = t.peek().getType() == TokenType.TRUE;
 			b1 = new Bool(value);
 			if (value) 
 				consume(t, TokenType.TRUE);
 			else 
 				consume(t, TokenType.FALSE);
-	    }else if (t.peek().isNum()) {
+	    } else if (t.peek().isNum()) {
 	    	b1 = parseAExpr(t);
-	    }else{
+	    } else{
 	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
 		};
 		
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
 			if (paren_count <= 0)
 				throw new SyntaxError("Parenthesis Mismatch");
-		}
-		else if (t.peek().getType().equals(TokenType.AND)) {
+		} else if (t.peek().getType().equals(TokenType.AND)) {
 			consume(t, TokenType.AND);
 			errOnNumber(t,b1);
 			b1 = new BExpr(b1, ExprOperator.AND, errOnNumber(t, parseBExpr(t)));
@@ -107,9 +140,10 @@ public class Parser{
 		} else if (t.peek().getType().equals(TokenType.LTE)){
 			consume(t, TokenType.LTE);
 			b1 = new BExpr(b1, ExprOperator.LTE, parseBExpr(t));
-		} else if (t.hasNext()){
-		  throw new SyntaxError("Boolean binop failed on line " + t.lineNumber());
-		}
+		} 
+//		else if (t.hasNext()){
+//		  throw new SyntaxError("Boolean binop failed on line " + t.lineNumber());
+//		} 
 		
 	    return b1;
 	  }
@@ -173,10 +207,44 @@ public class Parser{
 	 * @throws SyntaxError if the wrong kind of token is encountered.
 	 */
 	public static void consume(Tokenizer t, TokenType tt) throws SyntaxError {
-
+		if (tt.equals(TokenType.LPAREN))
+        	paren_count++;
+		else if (tt.equals(TokenType.RPAREN))
+			paren_count--;
+		else if (tt.equals(TokenType.LBRACE))
+			brace_count++;
+		else if (tt.equals(TokenType.RBRACE))
+			brace_count--;
+		if (paren_count < 0)
+			throw new SyntaxError("Parenthesis mismatch at line " + t.lineNumber());
+		if (brace_count < 0)
+			throw new SyntaxError("Bracket mismatch at line " + t.lineNumber());
+			
+			
 		if (t.peek().getType().equals(tt)) {
 			t.next();
 		} else
 			throw new SyntaxError("Syntax error");
+	}
+	
+	public static void consume(Tokenizer t, TokenType tt, String err) throws SyntaxError {
+		if (tt.equals(TokenType.LPAREN))
+        	paren_count++;
+		else if (tt.equals(TokenType.RPAREN))
+			paren_count--;
+		else if (tt.equals(TokenType.LBRACE))
+			brace_count++;
+		else if (tt.equals(TokenType.RBRACE))
+			brace_count--;
+		if (paren_count < 0)
+			throw new SyntaxError("Parenthesis mismatch at line " + t.lineNumber());
+		if (brace_count < 0)
+			throw new SyntaxError("Bracket mismatch at line " + t.lineNumber());
+			
+			
+		if (t.peek().getType().equals(tt)) {
+			t.next();
+		} else
+			throw new SyntaxError(err);
 	}
 }

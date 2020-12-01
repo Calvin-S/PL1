@@ -77,12 +77,12 @@ public interface Node extends Cloneable{
    void setParent(Node n);
 
    /**
-    * Sets the children of this node
+    * Adds to the children of this node
     * 
-    * @param children
-    *           - sets the children
-//    */
-//   void setChildren(List<Node> children);
+    * @param c
+    *           - adds c to children
+    */
+   void addChildren(Node c);
 
 //   /**
 //    * flattens the tree out to a long arraylist
