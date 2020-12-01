@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import ast.*;
-import ast.Expr.ExprOperator;
+import ast.Binop.ExprOperator;
 import ast.Number;
 
 public class Parser{
@@ -37,7 +37,7 @@ public class Parser{
 	public static Program parseProgram(Tokenizer t) throws SyntaxError {
 		Program p = new Program();
 		
-	    Expr e = parseBExpr(t);    //assuming all Exprs are AExprs
+	    Binop e = parseBExpr(t);    //assuming all Exprs are AExprs
 	    p.addNode(e);
   
 		return p;
@@ -71,6 +71,7 @@ public class Parser{
 	    }else{
 	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
 		};
+		
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
 			if (paren_count <= 0)
 				throw new SyntaxError("Parenthesis Mismatch");
@@ -101,9 +102,9 @@ public class Parser{
 		} else if (t.peek().getType().equals(TokenType.LTE)){
 			consume(t, TokenType.LTE);
 			b1 = new BExpr(b1, ExprOperator.LTE, parseBExpr(t));
-		}else if (t.hasNext()){
+		} else if (t.hasNext()){
 		  throw new SyntaxError("Boolean binop failed on line " + t.lineNumber());
-		    }
+		}
 		
 	    return b1;
 	  }
@@ -116,8 +117,36 @@ public class Parser{
 	}
 	
 	public static AExpr parseAExpr(Tokenizer t) throws SyntaxError{
+		AExpr a1 = parseAExprVal(t);
+		
+		if (t.peek().getType().equals(TokenType.TIMES)){
+			consume(t, TokenType.TIMES);
+			a1 = new AExpr(a1, ExprOperator.TIMES, parseAExprVal(t));
+		} else if (t.peek().getType().equals(TokenType.DIVIDE)){
+			consume(t, TokenType.DIVIDE);
+			a1 = new AExpr(a1, ExprOperator.DIVIDE, parseAExprVal(t));
+		}
+		
+		if (t.peek().getType().equals(TokenType.RPAREN)) {
+			if (paren_count <= 0)
+				throw new SyntaxError("Parenthesis Mismatch on line " + t.lineNumber());
+		}
+		else if (t.peek().getType().equals(TokenType.PLUS)) {
+				consume(t, TokenType.PLUS);
+				a1 = new AExpr(a1, ExprOperator.PLUS, parseAExpr(t));
+		} else if (t.peek().getType().equals(TokenType.MINUS)){
+				consume(t, TokenType.MINUS);
+				a1 = new AExpr(a1, ExprOperator.MINUS, parseAExpr(t));
+		} else if (t.peek().getType().equals(TokenType.EXP)){
+		  consume(t, TokenType.EXP);
+				a1 = new AExpr(a1, ExprOperator.EXP, parseAExpr(t));
+		} 
+	    return a1;
+	  }
+	
+	public static AExpr parseAExprVal(Tokenizer t) throws SyntaxError{
 		AExpr a1;
-	    if(t.peek().getType().equals(TokenType.LPAREN)){
+		if(t.peek().getType().equals(TokenType.LPAREN)){
 	        consume(t, TokenType.LPAREN);
 	        paren_count++;
 	        a1 = parseAExpr(t);
@@ -130,29 +159,8 @@ public class Parser{
 	    }else{
 	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};
-		
-		if (t.peek().getType().equals(TokenType.RPAREN)) {
-			if (paren_count <= 0)
-				throw new SyntaxError("Parenthesis Mismatch on line " + t.lineNumber());
-		}
-		else if (t.peek().getType().equals(TokenType.PLUS)) {
-				consume(t, TokenType.PLUS);
-				a1 = new AExpr(a1, ExprOperator.PLUS, parseAExpr(t));
-		} else if (t.peek().getType().equals(TokenType.MINUS)){
-				consume(t, TokenType.MINUS);
-				a1 = new AExpr(a1, ExprOperator.MINUS, parseAExpr(t));
-		} else if (t.peek().getType().equals(TokenType.TIMES)){
-		  consume(t, TokenType.TIMES);
-				a1 = new AExpr(a1, ExprOperator.TIMES, parseAExpr(t));
-		} else if (t.peek().getType().equals(TokenType.DIVIDE)){
-		  consume(t, TokenType.DIVIDE);
-				a1 = new AExpr(a1, ExprOperator.DIVIDE, parseAExpr(t));
-		} else if (t.peek().getType().equals(TokenType.EXP)){
-		  consume(t, TokenType.EXP);
-				a1 = new AExpr(a1, ExprOperator.EXP, parseAExpr(t));
-		} 
-	    return a1;
-	  }
+		return a1;
+	}
 
 	/**
 	 * Consumes a token of the expected type.

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class BExpr extends Expr{
+public class BExpr extends Binop{
 	
 	private ExprOperator operator;
-	private Expr left, right;
+	private Binop left, right;
 
 	protected BExpr() {} // For bool
 	
