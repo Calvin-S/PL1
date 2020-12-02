@@ -3,8 +3,12 @@ package interpreter;
 import java.util.List;
 
 import Parser.SyntaxError;
-import ast.*;
+import ast.BExpr;
+import ast.Bool;
+import ast.If;
+import ast.Node;
 import ast.Number;
+import ast.Program;
 
 public class Interpreter {
 
@@ -41,10 +45,40 @@ public class Interpreter {
 			BExpr b = (BExpr) n;
 			return evaluateBExpr(b);
 
+		} else if (n instanceof If) {
+
+			If r = (If) n;
+			return evaluateIf(r);
+
 		} else {
 			throw new SyntaxError("the tree I got cannot be evaluated. Please check me.");
 		}
 
+	}
+
+	public Value evaluateIf(If r) throws SyntaxError {
+
+		List<Node> guards = r.getGuards();
+		List<Node> branches = r.getBranches();
+
+		Node toExecute = null;
+
+		int i = 0;
+		while (i < guards.size()) {
+			Value v = evaluateExpr(guards.get(i));
+			if (!(v.getType().equals("bool"))) {
+				throw new SyntaxError("a guard I tried to evaluate is not a boolean");
+			} else {
+				if (v.getBool()) {
+					toExecute = branches.get(i);
+					break;
+				} else {
+					i++;
+				}
+			}
+		}
+
+		return evaluateExpr(toExecute);
 	}
 
 	public Value evaluateBExpr(BExpr b) throws SyntaxError {

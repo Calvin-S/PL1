@@ -1,5 +1,6 @@
 package ast;
 import java.util.ArrayList;
+import java.util.List;
 
 public class If extends Expr{
 	private ArrayList<BExpr> guards;
@@ -17,6 +18,22 @@ public class If extends Expr{
 		guards.add(guard);
 		branches.add(branch);
 		assert guards.size() == branches.size();
+	}
+
+	public List<Node> getGuards() {
+		List<Node> g = new ArrayList<Node>();
+		for (BExpr b : guards) {
+			g.add(b);
+		}
+		return g;
+	}
+
+	public List<Node> getBranches() {
+		List<Node> g = new ArrayList<Node>();
+		for (Expr b : branches) {
+			g.add(b);
+		}
+		return g;
 	}
 	
 	public String toString() {
