@@ -1,10 +1,12 @@
 package ast;
 
 public class Var extends Type{
-	private String name;
+	private String name; 
 	private Expr e;
+	private boolean getValue; // if True then should find value of this variable
 	
 	public Var(String name, Expr e) {
+		getValue = false;
 		this.name = name;
 		this.e = e;
 	}
@@ -27,7 +29,15 @@ public class Var extends Type{
 		return "BExpr";
 	}
 
+
 	public String getName() {
 		return name;
 	}
+
+	public void setAsValue() {
+		getValue = true;
+	}
+	
+	public boolean isValue() { return getValue; }
+
 }
