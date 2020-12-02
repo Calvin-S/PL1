@@ -82,7 +82,7 @@ public interface Node extends Cloneable{
     * @param c
     *           - adds c to children
     */
-   void addChildren(Node c);
+//   void addChildren(Node c);
 
 //   /**
 //    * flattens the tree out to a long arraylist
