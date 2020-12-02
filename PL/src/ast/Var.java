@@ -26,4 +26,8 @@ public class Var extends Type{
 	public String nodeType() {
 		return "BExpr";
 	}
+
+	public String getName() {
+		return name;
+	}
 }

@@ -10,6 +10,7 @@ import ast.If;
 import ast.Node;
 import ast.Number;
 import ast.Program;
+import ast.Var;
 
 public class Interpreter {
 
@@ -53,6 +54,28 @@ public class Interpreter {
 
 			If r = (If) n;
 			return evaluateIf(r);
+
+		} else if (n instanceof Var) {
+
+			Var r = (Var) n;
+
+			if (r.get___) {
+
+				if (store.containsKey(r.getName())) {
+					Value v = store.get(r.getName());
+
+					if (v == null) {
+						throw new SyntaxError("this variable does not have a value");
+					}
+
+					return store.get(r.getName());
+				} else {
+					throw new SyntaxError("this variable does not exist");
+				}
+
+			} else {
+
+			}
 
 		} else {
 			throw new SyntaxError("the tree I got cannot be evaluated. Please check me.");
