@@ -34,6 +34,10 @@ public class Var extends Type{
 		return name;
 	}
 
+	public Expr getChild() {
+		return e;
+	}
+
 	public void setAsValue() {
 		getValue = true;
 	}

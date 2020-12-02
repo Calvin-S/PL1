@@ -59,7 +59,7 @@ public class Interpreter {
 
 			Var r = (Var) n;
 
-			if (r.get___) {
+			if (r.isValue()) {
 
 				if (store.containsKey(r.getName())) {
 					Value v = store.get(r.getName());
@@ -74,7 +74,10 @@ public class Interpreter {
 				}
 
 			} else {
+				Value v = evaluateExpr(r.getChild());
+				store.put(r.getName(), v);
 
+				return v;
 			}
 
 		} else {
