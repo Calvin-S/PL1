@@ -44,14 +44,16 @@ public class Parser{
 	
 	public static Expr parseExpr(Tokenizer t) throws SyntaxError {
 		Expr e1;
-		if(t.peek().getType().equals(TokenType.LPAREN)){
+		if (t.peek().getType().equals(TokenType.SEMICOLON)) {
+			return null;
+		} else if(t.peek().getType().equals(TokenType.LPAREN)){
 	        consume(t, TokenType.LPAREN);
 	        e1 = parseExpr(t);
 	        consume(t, TokenType.RPAREN);
-	    } else if (t.peek().getType().equals(TokenType.IF)) {
+	    } else if (t.peek().getType().equals(TokenType.IF)) {  // IF statements
 	    	consume(t, TokenType.IF);
 	    	consume(t, TokenType.LPAREN, "If statement guards need parenthesis");
-	    	BExpr g = parseBExpr(t);
+	    	Type g = parseBExpr(t);
 	    	consume(t, TokenType.RPAREN);
 	    	consume(t, TokenType.LBRACE, "If statements bodies need brackets");
 	    	Expr body = parseExpr(t);
@@ -76,6 +78,17 @@ public class Parser{
 		    	consume(t, TokenType.RBRACE);
 	    		((If) e1).addBranch(new Bool(true), elseBody);
 	    	}
+		} else if (t.peek().getType().equals(TokenType.VAR)) {  // Variables
+			String temp;
+			System.out.println(t.peek().getType());
+			temp = t.next().toVarToken().getValue();
+			if (t.peek().getType().equals(TokenType.ASSIGN)) {
+				consume(t, TokenType.ASSIGN);
+				e1 = new Var(temp, parseExpr(t));
+			}
+			else {
+				e1 = new Var(temp, null);
+			}
 		} else if (t.peek().isBool() || t.peek().getType().equals(TokenType.NOT)) {
 	    	e1 = parseBExpr(t);
 	    } else if (t.peek().isNum()) {
@@ -86,15 +99,15 @@ public class Parser{
 		return e1;
 	}
 	
-	public static BExpr parseBExpr(Tokenizer t) throws SyntaxError{
-		BExpr b1;
+	public static Type parseBExpr(Tokenizer t) throws SyntaxError{
+		Type b1;
 	    if (t.peek().getType().equals(TokenType.LPAREN)){
 	        consume(t, TokenType.LPAREN);
 	        b1 = parseBExpr(t);
 	        consume(t, TokenType.RPAREN);
 	    } else if (t.peek().getType().equals(TokenType.NOT)){
 			consume(t, TokenType.NOT);
-			BExpr btemp = parseBExpr(t);
+			Type btemp = parseBExpr(t);
 			if (btemp.nodeType().equals("num"))
 				throw new SyntaxError("Cannot assign not to a number on line " + t.lineNumber());
 			b1 = new BExpr(btemp);
@@ -107,7 +120,13 @@ public class Parser{
 				consume(t, TokenType.FALSE);
 	    } else if (t.peek().isNum()) {
 	    	b1 = parseAExpr(t);
+	    } else if (t.peek().isVar()) {   
+	    	String temp;
+			System.out.println(t.peek().getType());
+			temp = t.next().toVarToken().getValue();
+			b1 = new Var(temp, null);
 	    } else{
+	    	System.out.println(t.peek().getType());
 	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
 		};
 		
@@ -140,7 +159,7 @@ public class Parser{
 		} else if (t.peek().getType().equals(TokenType.LTE)){
 			consume(t, TokenType.LTE);
 			b1 = new BExpr(b1, ExprOperator.LTE, parseBExpr(t));
-		} 
+		}
 //		else if (t.hasNext()){
 //		  throw new SyntaxError("Boolean binop failed on line " + t.lineNumber());
 //		} 
@@ -149,10 +168,10 @@ public class Parser{
 	  }
 	
 	// Throws error if b is a NUM, otherwise does nothing
-	private static BExpr errOnNumber(Tokenizer t, BExpr b) throws SyntaxError {
-		if (b.nodeType().equals("num"))
-			throw new SyntaxError("Cannot assign not to a number on line " + t.lineNumber());
-		return b;
+	private static Type errOnNumber(Tokenizer t, Type b1) throws SyntaxError {
+		if (b1.nodeType().equals("num"))
+			throw new SyntaxError("Failed assigning booleans on logical operators (perhaps add parenthesis) on line " + t.lineNumber());
+		return b1;
 	}
 	
 	public static AExpr parseAExpr(Tokenizer t) throws SyntaxError{
@@ -224,7 +243,7 @@ public class Parser{
 		if (t.peek().getType().equals(tt)) {
 			t.next();
 		} else
-			throw new SyntaxError("Syntax error");
+			throw new SyntaxError("Syntax error on consuming " + tt.name() + " " + t.peek().getType());
 	}
 	
 	public static void consume(Tokenizer t, TokenType tt, String err) throws SyntaxError {

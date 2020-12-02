@@ -1,5 +1,4 @@
-if (T) {T}
+if (F) {F}
 elif (F) {2}
-elif (1 == 2) {3 + 4}
+elif ((1 != 2) and T and 2 == 2) {3 + 4}
 else {1}
-else {2}

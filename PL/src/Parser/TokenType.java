@@ -29,6 +29,7 @@ public enum TokenType {
 	NUM(TC.VALUES, "<number>"),
     TRUE(TC.VALUES, "t"),
     FALSE(TC.VALUES, "f"),
+    VAR(TC.VALUES, "<var>"),
     
     IF(TC.COND, "if"),
     ELIF(TC.COND, "elif"),
@@ -36,6 +37,7 @@ public enum TokenType {
     FOR(TC.COND, "for"),
     WHILE(TC.COND, "while"),
     
+    ASSIGN(TC.OTHER, "="),
 	SEMICOLON(TC.OTHER, ";"),
 	LBRACKET(TC.OTHER, "["),
     RBRACKET(TC.OTHER, "]"),

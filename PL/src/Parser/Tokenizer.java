@@ -108,14 +108,13 @@ public class Tokenizer implements Iterator<Token> {
 	private void lexOneToken() throws IOException {
 
 		char c = in.next();
-
+		
 		// consume whitespace
 		while (Character.isWhitespace(c)) {
 			if (c == '\n')
 				lineNumber++;
 			c = in.next();
 		}
-
 		switch (c) {
 		case LookAheadBuffer.EOF:
 			addEOFToken();
@@ -183,7 +182,9 @@ public class Tokenizer implements Iterator<Token> {
 		case 'n':
 			consume("ot", "Expected not", TokenType.NOT);
 			break;
-		
+		case 'v':
+			lexVar();
+			break;
 		default:
 			if (Character.isLetter(c))
 				lexKeyword(c);
@@ -207,13 +208,34 @@ public class Tokenizer implements Iterator<Token> {
 		consume(next.charAt(next.length() - 1),peeked);
 	}
 	
+	private void consume(String next, String error) throws IOException {
+		int index = 0;
+		boolean matched = false;
+		while (index < next.length()) {
+			if ( next.charAt(index++) != in.peek()) {
+				addErrorToken(String.format(error));
+				return;
+			}
+			in.next();
+		}
+	}
+	
 	private void lexEq() throws IOException {
 		if (in.peek() == '=') {
-			in.next();
-			addToken(TokenType.EQ);
+			consume('=', TokenType.EQ);
 		} else {
-			addErrorToken(String.format("equals?"));
+			addToken(TokenType.ASSIGN);
 		}
+	}
+	
+	private void lexVar() throws IOException {
+		consume("ar ", "Expected 'var [name]'");
+		String n = "";
+		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != ';') {
+			n += Character.toString(in.next());
+		}
+		System.out.println(n + "!");
+		tokens.add(new Token.VarToken(n, lineNumber));
 	}
 
 	/**
@@ -316,9 +338,11 @@ public class Tokenizer implements Iterator<Token> {
 			sb.append(c);
 			c = in.scanAndPeek();
 		}
+		
 		try {
 			int val = Integer.parseInt(sb.toString());
 			tokens.add(new Token.NumToken(val, lineNumber));
+			
 		} catch (NumberFormatException e) {
 			addErrorToken(String.format("Number expected, got %s", sb.toString()));
 		}

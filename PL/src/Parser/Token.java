@@ -51,7 +51,13 @@ class Token {
     boolean isBool() {
     	return type == TokenType.TRUE || type == TokenType.FALSE;
     }
-
+    
+    boolean isString() {
+    	return type == TokenType.STRING;
+    }
+    boolean isVar() {
+    	return type == TokenType.VAR;
+    }
     /**
      * Returns the number token associated with this Token.
      *
@@ -63,6 +69,20 @@ class Token {
             return (NumToken) this;
         }
         throw new InputMismatchException("Token is not a number.");
+    }
+    
+    StringToken toStringToken() {
+    	if (isString()) {
+    		return (StringToken) this;
+    	}
+    	throw new InputMismatchException("Token is not a string.");
+    }
+    
+    VarToken toVarToken() {
+    	if (isVar()) {
+    		return (VarToken) this;
+    	}
+    	throw new InputMismatchException("Token is not a var.");
     }
 
     @Override
@@ -103,6 +123,76 @@ class Token {
         @Override
         public String toString() {
             return Integer.toString(value);
+        }
+    }
+    
+    static class StringToken extends Token {
+
+        /** The string value this token represents. */
+        private final String value;
+
+        /**
+         * Constructs a new {@code NumToken} representing the String value {@code v} on line {@code
+         * lineNum}.
+         *
+         * @param v the String value this token represents
+         * @param lineNum The line number in the input file containing this token. Checks {@code
+         *     lineNum > 0}. Note that a {@code StringToken} is not an error token, so the line number
+         *     must be positive.
+         */
+        StringToken(String v, int lineNum) {
+            super(TokenType.STRING, lineNum);
+            assert lineNum > 0 : "StringToken line number must be positive.";
+            value = v;
+        }
+
+        /**
+         * Returns the value of the number this token represents.
+         *
+         * @return the value of the number this token represents
+         */
+        String getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+    
+    static class VarToken extends Token {
+
+        /** The string value this token represents. */
+        private final String value;
+
+        /**
+         * Constructs a new {@code NumToken} representing the String value {@code v} on line {@code
+         * lineNum}.
+         *
+         * @param v the String value this token represents
+         * @param lineNum The line number in the input file containing this token. Checks {@code
+         *     lineNum > 0}. Note that a {@code StringToken} is not an error token, so the line number
+         *     must be positive.
+         */
+        VarToken(String v, int lineNum) {
+            super(TokenType.VAR, lineNum);
+            assert lineNum > 0 : "VarToken line number must be positive.";
+            value = v;
+        }
+
+        /**
+         * Returns the value of the number this token represents.
+         *
+         * @return the value of the number this token represents
+         */
+        String getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
         }
     }
 

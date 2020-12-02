@@ -3,17 +3,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class If extends Expr{
-	private ArrayList<BExpr> guards;
+	private ArrayList<Type> guards;
 	private ArrayList<Expr> branches;
 	
-	public If(BExpr guard, Expr branch) {
-		guards = new ArrayList<BExpr>();
+	public If(Type guard, Expr branch) {
+		guards = new ArrayList<Type>();
 		branches = new ArrayList<Expr>();
 		guards.add(guard);
 		branches.add(branch);
 	}
 	
-	public void addBranch(BExpr guard, Expr branch) {
+	public void addBranch(Type guard, Expr branch) {
 		assert guards != null && branches != null;
 		guards.add(guard);
 		branches.add(branch);
@@ -22,7 +22,7 @@ public class If extends Expr{
 
 	public List<Node> getGuards() {
 		List<Node> g = new ArrayList<Node>();
-		for (BExpr b : guards) {
+		for (Type b : guards) {
 			g.add(b);
 		}
 		return g;

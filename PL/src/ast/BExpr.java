@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class BExpr extends Expr{
+public class BExpr extends Type{
 	
 	private ExprOperator operator;
-	private Expr left, right;
+	private Type left, right;
 
 	protected BExpr() {} // For bool
 	
-	public BExpr(BExpr not) {
+	public BExpr(Type not) {
 		operator = ExprOperator.NOT;
 		right = not;
 		left = null;
@@ -23,7 +23,7 @@ public class BExpr extends Expr{
 	 * @param op The binary expression operation.
 	 * @param r  The expression to the right of the op.
 	 */
-	public BExpr(BExpr l, ExprOperator op, BExpr r) {
+	public BExpr(Type l, ExprOperator op, Type r) {
 		left = l;
 		operator = op;
 		right = r;
