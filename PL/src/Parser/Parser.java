@@ -120,9 +120,9 @@ public class Parser{
 	    } else if (t.peek().isNum()) {
 	    	b1 = parseAExpr(t);
 	    } else if (t.peek().isVar()) {   
-	    	String temp;
-			temp = t.next().toVarToken().getValue();
-			b1 = new Var(temp, null);
+			b1 = new Var(t.next().toVarToken().getValue(), null);
+			((Var) b1).isValue();
+			b1 = parseAExpr(t, b1);
 	    } else{
 	    	System.out.println(t.peek().getType());
 	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
@@ -157,7 +157,7 @@ public class Parser{
 		} else if (t.peek().getType().equals(TokenType.LTE)){
 			consume(t, TokenType.LTE);
 			b1 = new BExpr(b1, ExprOperator.LTE, parseBExpr(t));
-		}		
+		}
 	    return b1;
 	  }
 	
@@ -168,8 +168,8 @@ public class Parser{
 		return b1;
 	}
 	
-	public static AExpr parseAExpr(Tokenizer t) throws SyntaxError{
-		AExpr a1 = parseAExprVal(t);
+	public static Type parseAExpr(Tokenizer t) throws SyntaxError{
+		Type a1 = parseAExprVal(t);
 		
 		if (t.peek().getType().equals(TokenType.TIMES)){
 			consume(t, TokenType.TIMES);
@@ -196,19 +196,50 @@ public class Parser{
 	    return a1;
 	  }
 	
-	public static AExpr parseAExprVal(Tokenizer t) throws SyntaxError{
-		AExpr a1;
+	public static Type parseAExpr(Tokenizer t, Type b) throws SyntaxError{
+		Type a1 = b;
+		
+		if (t.peek().getType().equals(TokenType.TIMES)){
+			consume(t, TokenType.TIMES);
+			a1 = new AExpr(a1, ExprOperator.TIMES, parseAExprVal(t));
+		} else if (t.peek().getType().equals(TokenType.DIVIDE)){
+			consume(t, TokenType.DIVIDE);
+			a1 = new AExpr(a1, ExprOperator.DIVIDE, parseAExprVal(t));
+		}
+		
+		if (t.peek().getType().equals(TokenType.RPAREN)) {
+			if (paren_count <= 0)
+				throw new SyntaxError("Parenthesis Mismatch on line " + t.lineNumber());
+		}
+		else if (t.peek().getType().equals(TokenType.PLUS)) {
+				consume(t, TokenType.PLUS);
+				a1 = new AExpr(a1, ExprOperator.PLUS, parseAExpr(t));
+		} else if (t.peek().getType().equals(TokenType.MINUS)){
+				consume(t, TokenType.MINUS);
+				a1 = new AExpr(a1, ExprOperator.MINUS, parseAExpr(t));
+		} else if (t.peek().getType().equals(TokenType.EXP)){
+		  consume(t, TokenType.EXP);
+				a1 = new AExpr(a1, ExprOperator.EXP, parseAExpr(t));
+		} 
+	    return a1;
+	  }
+	
+	public static Type parseAExprVal(Tokenizer t) throws SyntaxError{
+		Type a1;
 		if(t.peek().getType().equals(TokenType.LPAREN)){
 	        consume(t, TokenType.LPAREN);
 	        paren_count++;
 	        a1 = parseAExpr(t);
 	        paren_count--;
 	        consume(t, TokenType.RPAREN);
-	    }else if (t.peek().isNum()) {
+	    } else if (t.peek().isNum()) {
 				int value = t.peek().toNumToken().getValue();
 				a1 = new Number(value);
 	      consume(t, TokenType.NUM);
-	    }else{
+	    } else if (t.peek().isVar()) {   
+			a1 = new Var(t.next().toVarToken().getValue(), null);
+			((Var) a1).isValue();
+	    } else{
 	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};
 		return a1;

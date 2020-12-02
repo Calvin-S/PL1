@@ -7,7 +7,7 @@ import java.util.List;
 public class AExpr extends BExpr{
 
 	private Expr.ExprOperator operator;
-	private AExpr left, right;
+	private Type left, right;
 
 	protected AExpr() {} // For a number
     /**
@@ -17,7 +17,7 @@ public class AExpr extends BExpr{
 	 * @param op The binary expression operation.
 	 * @param r  The expression to the right of the op.
 	 */
-	public AExpr(AExpr l, Expr.ExprOperator op, AExpr r) {
+	public AExpr(Type l, Expr.ExprOperator op, Type r) {
 		left = l;
 		operator = op;
 		right = r;
