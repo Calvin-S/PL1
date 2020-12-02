@@ -1,5 +1,6 @@
 package interpreter;
 
+import java.util.HashMap;
 import java.util.List;
 
 import Parser.SyntaxError;
@@ -12,7 +13,10 @@ import ast.Program;
 
 public class Interpreter {
 
+	private HashMap<String, Value> store = null;
+
 	public Interpreter() {
+		store = new HashMap<String, Value>();
 	}
 
 	public Value evaluateProg(Program p) throws SyntaxError {
