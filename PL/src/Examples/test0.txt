@@ -1,1 +1,1 @@
-var xasdfds = if (var x == 4) {2};
+var xasdfds = if (var x == var y) {2};

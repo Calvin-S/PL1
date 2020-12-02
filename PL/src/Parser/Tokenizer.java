@@ -231,10 +231,9 @@ public class Tokenizer implements Iterator<Token> {
 	private void lexVar() throws IOException {
 		consume("ar ", "Expected 'var [name]'");
 		String n = "";
-		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != ';') {
+		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != ';' && in.peek() != ')') {
 			n += Character.toString(in.next());
 		}
-		System.out.println(n + "!");
 		tokens.add(new Token.VarToken(n, lineNumber));
 	}
 
@@ -354,7 +353,7 @@ public class Tokenizer implements Iterator<Token> {
 	 * @param tokenType the type of the token to pushed, not {@code null}
 	 */
 	private void addToken(TokenType tokenType) {
-		System.out.println(tokenType);
+//		System.out.println(tokenType);
 		tokens.add(new Token(tokenType, lineNumber));
 	}
 

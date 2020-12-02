@@ -80,7 +80,6 @@ public class Parser{
 	    	}
 		} else if (t.peek().getType().equals(TokenType.VAR)) {  // Variables
 			String temp;
-			System.out.println(t.peek().getType());
 			temp = t.next().toVarToken().getValue();
 			if (t.peek().getType().equals(TokenType.ASSIGN)) {
 				consume(t, TokenType.ASSIGN);
@@ -122,7 +121,6 @@ public class Parser{
 	    	b1 = parseAExpr(t);
 	    } else if (t.peek().isVar()) {   
 	    	String temp;
-			System.out.println(t.peek().getType());
 			temp = t.next().toVarToken().getValue();
 			b1 = new Var(temp, null);
 	    } else{
@@ -159,11 +157,7 @@ public class Parser{
 		} else if (t.peek().getType().equals(TokenType.LTE)){
 			consume(t, TokenType.LTE);
 			b1 = new BExpr(b1, ExprOperator.LTE, parseBExpr(t));
-		}
-//		else if (t.hasNext()){
-//		  throw new SyntaxError("Boolean binop failed on line " + t.lineNumber());
-//		} 
-		
+		}		
 	    return b1;
 	  }
 	
