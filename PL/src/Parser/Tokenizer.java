@@ -189,6 +189,7 @@ public class Tokenizer implements Iterator<Token> {
 			break;
 		case 'w':
 			lexWhile();
+			break;
 		case '$':
 			lexVar(true);
 			break;
@@ -211,7 +212,8 @@ public class Tokenizer implements Iterator<Token> {
 				return;
 			}
 		}
-		in.next();
+		for (int i = 0; i < next.length() - 1; i++)
+			in.next();
 		consume(next.charAt(next.length() - 1),peeked);
 	}
 	
@@ -268,12 +270,13 @@ public class Tokenizer implements Iterator<Token> {
 	}
 	
 	private void lexN() throws IOException {
-		consume("ot", "Expected not", TokenType.NOT);
+//		consume("ot", "Expected not", TokenType.NOT);
 		
-//		if (in.peek() == 'o')
-//			consume("ot", "Expected not", TokenType.NOT);
-//		else
-//			consume("ull", "Expected null", TokenType.NULL);
+		if (in.peek() == 'o')
+			consume("ot", "Expected not", TokenType.NOT);
+		else {
+			consume("ull", "Expected null", TokenType.NULL);
+		}
 	}
 	/**
 	 * Lexes a division symbol '/'. May be the start of an end-of-line comment with

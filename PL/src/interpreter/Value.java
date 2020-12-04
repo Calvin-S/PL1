@@ -20,7 +20,7 @@ public class Value {
 
 	public Value(String s) {
 		intVal = 0;
-		stringVal = "";
+		stringVal = s;
 		boolVal = false;
 		nullVal = false;
 

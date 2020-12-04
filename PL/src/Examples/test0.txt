@@ -1,5 +1,6 @@
 $a = "ASD" 
 3+2
 var s = 4 + -13422 +1 
-if (3 > 1) {T} elif (F) {F $a = 3 $b = "Shin yi is evil"}
+$c = if (T and F) {F} elif (F) {F $a = 3 $b = "Shin yi is evil"} elif (F) {23+42+ -123}
 21474836471
+$d = null

@@ -98,13 +98,13 @@ public class Parser{
 	    		((If) e1).addBranch(new Bool(true), elseBody);
 	    	}
 		} else if (t.peek().getType().equals(TokenType.WHILE)) {
-			consume(t, TokenType.IF);
+			consume(t, TokenType.WHILE);
 	    	consume(t, TokenType.LPAREN, "While statement guard needs parenthesis");
 	    	e1 = new While(parseBExpr(t));
 	    	consume(t, TokenType.RPAREN);
 	    	consume(t,TokenType.LBRACE, "While statement needs a body using curly brackets");
-	    	((While) e1).addBranch(parseExpr(t));
-	    	consume(t,TokenType.LBRACE, "While statement body needs closing brackets");
+	    	((While) e1).addBranch(parseSeqCond(t));
+	    	consume(t,TokenType.RBRACE, "While statement body needs closing brackets");
 		} else if (t.peek().getType().equals(TokenType.VAR)) {  // Variables
 			String temp = t.next().toVarToken().getValue();
 			if (t.peek().getType().equals(TokenType.ASSIGN)) {
@@ -122,8 +122,10 @@ public class Parser{
 	    	String temp = t.next().toStringToken().getValue();
 	    	e1 = new Str(temp);
 	    } else if (t.peek().isNull()) {
+	    	consume(t, TokenType.NULL);
 	    	e1 = new Null();
 	    } else{
+	    	System.out.println(t.peek());
 	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
 		};
 		return e1;
