@@ -29,7 +29,9 @@ Expr
 | if (BExpr) {Seq} Elif
 | while (BExpr) {Seq}
 | $[var_name]
+| var [var_name]
 | $[var_name] = Expr
+| var [var_name] = Expr
 ```
 Elif
 ```
@@ -42,6 +44,7 @@ BExpr
 | F
 | AExpr
 | $[var_name]
+| var [var_name]
 | not BExpr
 | BExpr or BExpr
 | BExpr andBExpr
@@ -54,6 +57,7 @@ AExpr
 ```
 | int
 | $[var_name]
+| var [var_name]
 | AExpr * AExpr
 | AExpr / AExpr
 | AExpr + AExpr
@@ -62,17 +66,20 @@ AExpr
 
 ### Expression as functions
 Because every expression acts like a function (aka returns some value), we can even assign expressions to variables. So we will first cover variable syntax:
-Variable declaration (this variable will automatically be equal to null)
+Variable declaration (both expressions achieve the same effect)
 ```
 $[var_name];
+var [var_name];
 ```
 Variable instantation
 ```
 $[var_name] = Expr
+var [var_name] = Expr
 ```
 Getting Variable value
 ```
 $[var_name]
+var [var_name]
 ```
 
 Examples shown below with the arrow denoting the interpreted returned value:
