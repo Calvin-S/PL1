@@ -49,6 +49,10 @@ public class Interpreter {
 
 	}
 
+	public HashMap<String, Value> getStore() {
+		return store;
+	}
+
 	// evaluates a SINGLE line, not a whole program
 	public Value evaluateExpr(Node n) throws SyntaxError {
 
