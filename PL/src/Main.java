@@ -5,8 +5,8 @@ import java.io.Reader;
 import java.util.HashMap;
 
 import Parser.Parser;
-import Parser.SyntaxError;
 import ast.Program;
+import interpreter.EvaluationError;
 import interpreter.Interpreter;
 import interpreter.Value;
 
@@ -24,8 +24,8 @@ public class Main {
 		Value v;
 		try {
 			v = i.evaluateProg(prog);
-			System.out.println(v.toString());
-		} catch (SyntaxError e) {
+			System.out.println("Prog Value: " + v.toString());
+		} catch (EvaluationError e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

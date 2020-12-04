@@ -3,7 +3,6 @@ package interpreter;
 import java.util.HashMap;
 import java.util.List;
 
-import Parser.SyntaxError;
 import ast.BExpr;
 import ast.Bool;
 import ast.Expr;
@@ -25,7 +24,7 @@ public class Interpreter {
 		store = new HashMap<String, Value>();
 	}
 
-	public Value evaluateProg(Program p) throws SyntaxError {
+	public Value evaluateProg(Program p) throws EvaluationError {
 		Seq seq = (Seq) p.getChildren().get(0);
 		List<Expr> children = seq.getSeq();
 
@@ -55,7 +54,7 @@ public class Interpreter {
 	}
 
 	// evaluates a SINGLE line, not a whole program
-	public Value evaluateExpr(Node n) throws SyntaxError {
+	public Value evaluateExpr(Node n) throws EvaluationError {
 
 		if (n instanceof Number) {
 
@@ -110,7 +109,7 @@ public class Interpreter {
 					}
 					
 				}else {
-					throw new SyntaxError("Guard is not a boolean");
+					throw new EvaluationError("Guard is not a boolean");
 				}
 			}
 			
@@ -136,12 +135,12 @@ public class Interpreter {
 
 		} else {
 			System.out.println(n.getClass());
-			throw new SyntaxError("the tree I got cannot be evaluated. Please check me.");
+			throw new EvaluationError("the tree I got cannot be evaluated. Please check me.");
 		}
 
 	}
 
-	public Value evaluateVal(Var r) throws SyntaxError {
+	public Value evaluateVal(Var r) throws EvaluationError {
 
 		if (r.isValue()) {
 
@@ -149,12 +148,12 @@ public class Interpreter {
 				Value v = store.get(r.getName());
 
 				if (v == null) {
-					throw new SyntaxError("this variable does not have a value");
+					throw new EvaluationError("this variable does not have a value");
 				}
 
 				return store.get(r.getName());
 			} else {
-				throw new SyntaxError("this variable does not exist");
+				throw new EvaluationError("this variable does not exist");
 			}
 
 		} else {
@@ -171,7 +170,7 @@ public class Interpreter {
 		}
 	}
 
-	public Value evaluateIf(If r) throws SyntaxError {
+	public Value evaluateIf(If r) throws EvaluationError {
 
 		List<Node> guards = r.getGuards();
 		List<Node> branches = r.getBranches();
@@ -182,7 +181,7 @@ public class Interpreter {
 		while (i < guards.size()) {
 			Value v = evaluateExpr(guards.get(i));
 			if (!(v.getType().equals("bool"))) {
-				throw new SyntaxError("a guard I tried to evaluate is not a boolean");
+				throw new EvaluationError("a guard I tried to evaluate is not a boolean");
 			} else {
 				if (v.getBool()) {
 					toExecute = branches.get(i);
@@ -200,7 +199,7 @@ public class Interpreter {
 		return evaluateExpr(toExecute);
 	}
 
-	public Value evaluateBExpr(BExpr b) throws SyntaxError {
+	public Value evaluateBExpr(BExpr b) throws EvaluationError {
 
 		if (b.getOperator().equals("not")) {
 			
@@ -209,7 +208,7 @@ public class Interpreter {
 			if (v.getType().equals("bool")) {
 				return new Value(!v.getBool());
 			} else {
-				throw new SyntaxError("calling NOT on something that is not a boolean");
+				throw new EvaluationError("calling NOT on something that is not a boolean");
 			}
 
 		} else if (b.getOperator().equals("+")) {
@@ -219,7 +218,7 @@ public class Interpreter {
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() + v2.getInt());
 			} else {
-				throw new SyntaxError("trying to add one or more things that are not ints");
+				throw new EvaluationError("trying to add one or more things that are not ints");
 			}
 		} else if (b.getOperator().equals("-")) {
 
@@ -229,7 +228,7 @@ public class Interpreter {
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() - v2.getInt());
 			} else {
-				throw new SyntaxError("trying to sub one or more things that are not ints");
+				throw new EvaluationError("trying to sub one or more things that are not ints");
 			}
 
 		} else if (b.getOperator().equals("*")) {
@@ -240,7 +239,7 @@ public class Interpreter {
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() * v2.getInt());
 			} else {
-				throw new SyntaxError("trying to mult one or more things that are not ints");
+				throw new EvaluationError("trying to mult one or more things that are not ints");
 			}
 
 		} else if (b.getOperator().equals("/")) {
@@ -252,11 +251,11 @@ public class Interpreter {
 				if (v2.getInt() != 0) {
 					return new Value(v1.getInt() / v2.getInt());
 				} else {
-					throw new SyntaxError("cannot divide by 0");
+					throw new EvaluationError("cannot divide by 0");
 				}
 
 			} else {
-				throw new SyntaxError("trying to div one or more things that are not ints");
+				throw new EvaluationError("trying to div one or more things that are not ints");
 			}
 
 		} else if (b.getOperator().equals("**")) {
@@ -266,7 +265,7 @@ public class Interpreter {
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value((int) Math.pow(v1.getInt(), v2.getInt()));
 			} else {
-				throw new SyntaxError("trying to exp one or more things that are not ints");
+				throw new EvaluationError("trying to exp one or more things that are not ints");
 			}
 
 		} else if (b.getOperator().equals("and")) {
@@ -276,7 +275,7 @@ public class Interpreter {
 			if (v1.getType().equals("bool") && v2.getType().equals("bool")) {
 				return new Value(v1.getBool() && v2.getBool());
 			} else {
-				throw new SyntaxError("trying to and one or more things that are not bools");
+				throw new EvaluationError("trying to and one or more things that are not bools");
 			}
 		} else if (b.getOperator().equals("or")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
@@ -285,7 +284,7 @@ public class Interpreter {
 			if (v1.getType().equals("bool") && v2.getType().equals("bool")) {
 				return new Value(v1.getBool() || v2.getBool());
 			} else {
-				throw new SyntaxError("trying to or one or more things that are not bools");
+				throw new EvaluationError("trying to or one or more things that are not bools");
 			}
 		} else if (b.getOperator().equals("==")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
@@ -298,7 +297,7 @@ public class Interpreter {
 			} else if (v1.getType().equals("string") && v2.getType().equals("string")) {
 				return new Value(v1.getString().equals(v2.getString()));
 			} else {
-				throw new SyntaxError("trying to == two things of different or invalid types");
+				throw new EvaluationError("trying to == two things of different or invalid types");
 			}
 		} else if (b.getOperator().equals("!=")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
@@ -311,7 +310,7 @@ public class Interpreter {
 			} else if (v1.getType().equals("string") && v2.getType().equals("string")) {
 				return new Value(!(v1.getString().equals(v2.getString())));
 			} else {
-				throw new SyntaxError("trying to != two things of different or invalid types");
+				throw new EvaluationError("trying to != two things of different or invalid types");
 			}
 		} else if (b.getOperator().equals(">")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
@@ -320,7 +319,7 @@ public class Interpreter {
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() > v2.getInt());
 			} else {
-				throw new SyntaxError("trying to > one or more things that are not int");
+				throw new EvaluationError("trying to > one or more things that are not int");
 			}
 		} else if (b.getOperator().equals("<")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
@@ -329,7 +328,7 @@ public class Interpreter {
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() < v2.getInt());
 			} else {
-				throw new SyntaxError("trying to < one or more things that are not int");
+				throw new EvaluationError("trying to < one or more things that are not int");
 			}
 		} else if (b.getOperator().equals(">=")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
@@ -338,7 +337,7 @@ public class Interpreter {
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() >= v2.getInt());
 			} else {
-				throw new SyntaxError("trying to >= one or more things that are not int");
+				throw new EvaluationError("trying to >= one or more things that are not int");
 			}
 		} else if (b.getOperator().equals("<=")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
@@ -347,10 +346,10 @@ public class Interpreter {
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() <= v2.getInt());
 			} else {
-				throw new SyntaxError("trying to <= one or more things that are not int");
+				throw new EvaluationError("trying to <= one or more things that are not int");
 			}
 		} else {
-			throw new SyntaxError("invalid operator");
+			throw new EvaluationError("invalid operator");
 		}
 
 	}
