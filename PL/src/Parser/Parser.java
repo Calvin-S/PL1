@@ -73,46 +73,51 @@ public class Parser{
 	    	consume(t, TokenType.IF);
 	    	consume(t, TokenType.LPAREN, "If statement guards need parenthesis");
 	    	Type g = parseBExpr(t);
-	    	consume(t, TokenType.RPAREN);
+	    	consume(t, TokenType.RPAREN, "If guard missing closing parenthesis");
 	    	consume(t, TokenType.LBRACE, "If statements bodies need brackets");
 	    	Seq body = parseSeqCond(t);
-	    	consume(t, TokenType.RBRACE);
+	    	consume(t, TokenType.RBRACE, "If statement body needs a closing bracket");
 	    	e1 = new If(g, body);
 	    	while (t.peek().getType().equals(TokenType.ELIF)) {
 	    		if (t.peek().getType().equals(TokenType.ELSE))
 	    			break;
-	    		consume(t, TokenType.ELIF, "Else if statements guards need parenthesis");
-	    		consume(t, TokenType.LPAREN);
+	    		consume(t, TokenType.ELIF);
+	    		consume(t, TokenType.LPAREN, "Else if guards need parenthesis");
 		    	g = parseBExpr(t);
-		    	consume(t, TokenType.RPAREN);
+		    	consume(t, TokenType.RPAREN, "Else if guard missing closing parenthesis");
 		    	consume(t, TokenType.LBRACE, "Else if statements bodies need brackets");
 		    	Seq elifBody = parseSeqCond(t);
-		    	consume(t, TokenType.RBRACE);
+		    	consume(t, TokenType.RBRACE, "Else if statement bodies needs a closing bracket");
 		    	((If) e1).addBranch(g, elifBody);
 	    	}
 	    	if (t.peek().getType().equals(TokenType.ELSE)) {
 	    		consume(t, TokenType.ELSE);
 	    		consume(t, TokenType.LBRACE, "Else statement bodies need brackets");
 		    	Seq elseBody = parseSeqCond(t);
-		    	consume(t, TokenType.RBRACE);
+		    	consume(t, TokenType.RBRACE, "Else statement bodies needs a closing bracket");
 	    		((If) e1).addBranch(new Bool(true), elseBody);
 	    	}
 		} else if (t.peek().getType().equals(TokenType.WHILE)) {
 			consume(t, TokenType.WHILE);
 	    	consume(t, TokenType.LPAREN, "While statement guard needs parenthesis");
 	    	e1 = new While(parseBExpr(t));
-	    	consume(t, TokenType.RPAREN);
+	    	consume(t, TokenType.RPAREN, "While statement guard needs closing parenthesis");
 	    	consume(t,TokenType.LBRACE, "While statement needs a body using curly brackets");
 	    	((While) e1).addBranch(parseSeqCond(t));
-	    	consume(t,TokenType.RBRACE, "While statement body needs closing brackets");
+	    	consume(t,TokenType.RBRACE, "While statement body needs a closing bracket");
 		} else if (t.peek().getType().equals(TokenType.VAR)) {  // Variables
 			String temp = t.next().toVarToken().getValue();
 			if (t.peek().getType().equals(TokenType.ASSIGN)) {
 				consume(t, TokenType.ASSIGN);
 				e1 = new Var(temp, parseExpr(t));
 			}
+			else if (t.peek().getType().equals(TokenType.SEMICOLON)) {
+				e1 = new Var(temp, null);
+			}
 			else {
 				e1 = new Var(temp, null);
+				((Var) e1).setAsValue();
+				e1 = parseBExpr1(t, (Var) e1);
 			}
 		} else if (t.peek().isBool() || t.peek().getType().equals(TokenType.NOT)) {
 	    	e1 = parseBExpr(t);
@@ -155,7 +160,7 @@ public class Parser{
 	    	b1 = new Null();
 	    } else if (t.peek().isNum()) {
 	    	b1 = parseAExpr(t);
-	    } else if (t.peek().isVar()) {   
+	    } else if (t.peek().isVar()) {
 			b1 = new Var(t.next().toVarToken().getValue(), null);
 			((Var) b1).setAsValue();
 			b1 = parseAExpr(t, b1);
@@ -197,6 +202,42 @@ public class Parser{
 	    return b1;
 	  }
 	
+	public static Type parseBExpr1(Tokenizer t, Type btemp) throws SyntaxError{
+		Type b1 = btemp;
+		
+		if (t.peek().getType().equals(TokenType.RPAREN)) {
+			if (paren_count <= 0)
+				throw new SyntaxError("Parenthesis Mismatch");
+		} else if (t.peek().getType().equals(TokenType.AND)) {
+			consume(t, TokenType.AND);
+			errOnNumber(t,b1);
+			b1 = new BExpr(b1, ExprOperator.AND, errOnNumber(t, parseBExpr(t)));
+		} else if (t.peek().getType().equals(TokenType.OR)){
+			consume(t, TokenType.OR);
+			errOnNumber(t,b1);
+			b1 = new BExpr(b1, ExprOperator.OR, errOnNumber(t, parseBExpr(t)));
+		} else if (t.peek().getType().equals(TokenType.EQ)){
+			consume(t, TokenType.EQ);
+			b1 = new BExpr(b1, ExprOperator.EQ, parseBExpr(t));
+		} else if (t.peek().getType().equals(TokenType.NEQ)){
+			consume(t, TokenType.NEQ);
+			b1 = new BExpr(b1, ExprOperator.NEQ, parseBExpr(t));
+		} else if (t.peek().getType().equals(TokenType.GT)){
+			consume(t, TokenType.GT);
+			b1 = new BExpr(b1, ExprOperator.GT, parseBExpr(t));
+		} else if (t.peek().getType().equals(TokenType.LT)){
+			consume(t, TokenType.LT);
+			b1 = new BExpr(b1, ExprOperator.LT, parseBExpr(t));
+		} else if (t.peek().getType().equals(TokenType.GTE)){
+			consume(t, TokenType.GTE);
+			b1 = new BExpr(b1, ExprOperator.GTE, parseBExpr(t));
+		} else if (t.peek().getType().equals(TokenType.LTE)){
+			consume(t, TokenType.LTE);
+			b1 = new BExpr(b1, ExprOperator.LTE, parseBExpr(t));
+		}
+	    return parseAExpr(t, b1);
+	  }
+	
 	// Throws error if b is a NUM, otherwise does nothing
 	private static Type errOnNumber(Tokenizer t, Type b1) throws SyntaxError {
 		if (b1.nodeType().equals("num"))
@@ -206,6 +247,7 @@ public class Parser{
 	
 	public static Type parseAExpr(Tokenizer t) throws SyntaxError{
 		Type a1 = parseAExprVal(t);
+		
 		
 		if (t.peek().getType().equals(TokenType.TIMES)){
 			consume(t, TokenType.TIMES);
@@ -234,14 +276,6 @@ public class Parser{
 	
 	public static Type parseAExpr(Tokenizer t, Type b) throws SyntaxError{
 		Type a1 = b;
-		
-		if (t.peek().getType().equals(TokenType.TIMES)){
-			consume(t, TokenType.TIMES);
-			a1 = new AExpr(a1, ExprOperator.TIMES, parseAExprVal(t));
-		} else if (t.peek().getType().equals(TokenType.DIVIDE)){
-			consume(t, TokenType.DIVIDE);
-			a1 = new AExpr(a1, ExprOperator.DIVIDE, parseAExprVal(t));
-		}
 		
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
 			if (paren_count <= 0)
@@ -278,6 +312,14 @@ public class Parser{
 	    } else{
 	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};
+		
+		if (t.peek().getType().equals(TokenType.TIMES)){
+			consume(t, TokenType.TIMES);
+			a1 = new AExpr(a1, ExprOperator.TIMES, parseAExprVal(t));
+		} else if (t.peek().getType().equals(TokenType.DIVIDE)){
+			consume(t, TokenType.DIVIDE);
+			a1 = new AExpr(a1, ExprOperator.DIVIDE, parseAExprVal(t));
+		}
 		return a1;
 	}
 

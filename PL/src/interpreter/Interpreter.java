@@ -100,11 +100,12 @@ public class Interpreter {
 			while(flag) {
 				Value vguard = evaluateExpr(r.getGuard());
 				if(vguard.getType().equals("bool")) {
-					
 					if(vguard.getBool()) {
 						Seq body = r.getBody();
 						vbody = evaluateExpr(body);
 					}else {
+						if (vbody == null)
+							vbody = new Value();
 						flag = false;
 					}
 					
@@ -157,9 +158,15 @@ public class Interpreter {
 			}
 
 		} else {
-			Value v = evaluateExpr(r.getChild());
-			store.put(r.getName(), v);
-
+			Value v;
+			if (r.getChild() != null) {
+				v = evaluateExpr(r.getChild());
+				store.put(r.getName(), v);
+			}
+			else {
+				v = new Value();
+				store.put(r.getName(), v);
+			}
 			return v;
 		}
 	}

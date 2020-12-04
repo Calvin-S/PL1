@@ -1,4 +1,6 @@
-if (F) {F}
+$a = T
+$b = if (3 < 1) {F}
+elif (not $a) {0}
 elif (F) {2}
-elif ((1 != 2) and T and 2 == 2) {3 + 4}
-else {1}
+elif ((1 != 2) and 2 == 2) {"hi"}
+else {"no"}

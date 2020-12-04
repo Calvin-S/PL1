@@ -13,7 +13,7 @@ import interpreter.Value;
 public class Main {
 	public static void main(String args[]) {
 		
-		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test3.txt");
+		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test8.txt");
 		Reader r = new BufferedReader(new InputStreamReader(in));
 
 		Parser parser = new Parser();
@@ -30,7 +30,7 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		System.out.println("STORE");
+		System.out.println("\nSTORE VALUES:");
 
 		HashMap<String, Value> store = i.getStore();
 		
