@@ -1,1 +1,3 @@
-while (T) {$a = 23 34}
+$a = T
+$b = if ($a) {3}
+$c = "ASDF"

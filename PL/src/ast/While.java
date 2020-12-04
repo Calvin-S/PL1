@@ -25,7 +25,7 @@ public class While extends Expr{
 	}
 	
 	public String toString() {
-		String s = "{ While " + guard;
+		String s = "{While " + guard;
 		s += " do " + body + "}";
 		return s;
 	}
