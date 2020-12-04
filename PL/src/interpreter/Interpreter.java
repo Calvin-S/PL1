@@ -6,10 +6,14 @@ import java.util.List;
 import Parser.SyntaxError;
 import ast.BExpr;
 import ast.Bool;
+import ast.Expr;
 import ast.If;
 import ast.Node;
+import ast.Null;
 import ast.Number;
 import ast.Program;
+import ast.Seq;
+import ast.Str;
 import ast.Var;
 
 public class Interpreter {
@@ -21,13 +25,22 @@ public class Interpreter {
 	}
 
 	public Value evaluateProg(Program p) throws SyntaxError {
-		List<Node> children = p.getChildren();
+		Seq seq = (Seq) p.getChildren().get(0);
+		List<Expr> children = seq.getSeq();
 
 		// assuming the only children are exprs, no functions or anything yet.
 
+		Value lastVal = null;
+
 		for (int i = 0; i < children.size(); i++) {
-			evaluateExpr(children.get(i));
+			if (i == children.size() - 1) {
+				lastVal = evaluateExpr(children.get(i));
+			} else {
+				evaluateExpr(children.get(i));
+			}
 		}
+
+		return lastVal;
 
 		// what value to return?
 
@@ -40,10 +53,12 @@ public class Interpreter {
 	public Value evaluateExpr(Node n) throws SyntaxError {
 
 		if (n instanceof Number) {
+
 			Number r = (Number) n;
 			return new Value(r.getNum());
 
 		} else if (n instanceof Bool) {
+
 			Bool r = (Bool) n;
 			return new Value(r.getBool());
 
@@ -51,6 +66,11 @@ public class Interpreter {
 
 			BExpr b = (BExpr) n;
 			return evaluateBExpr(b);
+
+		} else if (n instanceof Str) {
+
+			Str r = (Str) n;
+			return new Value(r.getString());
 
 		} else if (n instanceof If) {
 
@@ -60,33 +80,41 @@ public class Interpreter {
 		} else if (n instanceof Var) {
 
 			Var r = (Var) n;
+			return evaluateVal(r);
 
-			if (r.isValue()) {
+		} else if (n instanceof Null) {
 
-				if (store.containsKey(r.getName())) {
-					Value v = store.get(r.getName());
-
-					if (v == null) {
-						throw new SyntaxError("this variable does not have a value");
-					}
-
-					return store.get(r.getName());
-				} else {
-					throw new SyntaxError("this variable does not exist");
-				}
-
-			} else {
-				Value v = evaluateExpr(r.getChild());
-				store.put(r.getName(), v);
-
-				return v;
-			}
+			return new Value();
 
 		} else {
 			System.out.println(n.getClass());
 			throw new SyntaxError("the tree I got cannot be evaluated. Please check me.");
 		}
 
+	}
+
+	public Value evaluateVal(Var r) throws SyntaxError {
+
+		if (r.isValue()) {
+
+			if (store.containsKey(r.getName())) {
+				Value v = store.get(r.getName());
+
+				if (v == null) {
+					throw new SyntaxError("this variable does not have a value");
+				}
+
+				return store.get(r.getName());
+			} else {
+				throw new SyntaxError("this variable does not exist");
+			}
+
+		} else {
+			Value v = evaluateExpr(r.getChild());
+			store.put(r.getName(), v);
+
+			return v;
+		}
 	}
 
 	public Value evaluateIf(If r) throws SyntaxError {
