@@ -94,22 +94,28 @@ public class Interpreter {
 		} else if (n instanceof While) {
 			While r = (While) n;
 			
-			Value v = evaluateExpr(r.getGuard());
-			if(v.getType().equals("bool")) {
-				Seq body = r.getBody();
-
+			boolean flag = true;
+			Value vbody = null;
 			
-				
-			}else {
-				throw new SyntaxError("Guard is not a boolean");
+			while(flag) {
+				Value vguard = evaluateExpr(r.getGuard());
+				if(vguard.getType().equals("bool")) {
+					
+					if(vguard.getBool()) {
+						Seq body = r.getBody();
+						vbody = evaluateExpr(body);
+					}else {
+						flag = false;
+					}
+					
+				}else {
+					throw new SyntaxError("Guard is not a boolean");
+				}
 			}
 			
-
+			return vbody;
 			
-			
-		
-			
-		}else { if (n instanceof Seq) {
+		} else if (n instanceof Seq) {
 
 			List<Expr> children = ((Seq) n).getSeq();
 
