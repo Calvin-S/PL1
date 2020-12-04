@@ -1,13 +1,15 @@
 # Vision
-We attempting to implement a fully working language based off of our own designs. We will start from pretty much scratch and build a lexer, parser, and evaluater for this language with very little starter code (the exceptions are the tokenizer and look-ahead-buffer). Currently our language implementation is a true blend of imperative and functional programming languages.   General expressions such as If-statements, While-loops, basic arithmetic operations, string manipulation, etc. will be included in our language. 
+We attempting to implement a fully working language based off of our own designs. We will start from pretty much scratch and build a lexer, parser, and evaluater for this language with very little starter code (the exceptions are the tokenizer and look-ahead-buffer). Currently our language implementation is a true blend of imperative and functional programming languages. All expressions return some value, meaning variables can be assigned to expressions such as If-statements, While-loops (Note higher order functions do not exist as of the current implementation). 
 
 ## Core features:
     - For and While Loops
     - Variables - ints, strings, booleans
     - String Manipulation - substring, reverse, concatenation
     - Ability to call and define functions
+    - Acts functionally as variables can be assigned to expressions
 
-One interesting feature of our language is that expressions will go all the way to the right like it does in lambda calculus. An example of how our language interprets is shown below:
+One interesting feature of our language is that expressions will go all the way to the right like it does in lambda cCurrently all expressions return some value, meaning variables can be assigned to expressions such as If-statements, While-loops (Note higher order functions do not exist).
+alculus. An example of how our language interprets is shown below:
 ```
 not T or F --> not (T or F)
 4 + 2 - 3 + 1 --> 4 + (2 - (3 + 1))

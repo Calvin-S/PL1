@@ -150,6 +150,9 @@ public class Parser{
 				consume(t, TokenType.TRUE);
 			else 
 				consume(t, TokenType.FALSE);
+	    } else if (t.peek().isNull()) {
+	    	consume(t, TokenType.NULL);
+	    	b1 = new Null();
 	    } else if (t.peek().isNum()) {
 	    	b1 = parseAExpr(t);
 	    } else if (t.peek().isVar()) {   
