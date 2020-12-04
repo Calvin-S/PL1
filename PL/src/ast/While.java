@@ -1,8 +1,5 @@
 package ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class While extends Expr{
 	private Type guard;
 	private Seq body;
@@ -16,7 +13,7 @@ public class While extends Expr{
 		body = branch;
 	}
 
-	public Node getGuards() {
+	public Node getGuard() {
 		return guard;
 	}
 
