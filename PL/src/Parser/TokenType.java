@@ -30,6 +30,7 @@ public enum TokenType {
     TRUE(TC.VALUES, "t"),
     FALSE(TC.VALUES, "f"),
     VAR(TC.VALUES, "<var>"),
+    NULL(TC.VALUES, "null"),
     
     IF(TC.COND, "if"),
     ELIF(TC.COND, "elif"),

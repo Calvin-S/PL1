@@ -1,1 +1,5 @@
-var xasdfds = if ( var x + var y == var z - var z) {2};
+$a = "ASD" 
+3+2
+var s = 4 + -13422 +1 
+if (3 > 1) {T} elif (F) {F $a = 3 $b = "Shin yi is evil"}
+21474836471

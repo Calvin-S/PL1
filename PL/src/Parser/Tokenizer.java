@@ -37,8 +37,7 @@ public class Tokenizer implements Iterator<Token> {
 	 * @param r The source from which the Tokenizer lexes input into Tokens
 	 */
 	public Tokenizer(Reader r) {
-		// need lookahead capacity 2 for -->
-		in = new LookAheadBuffer(3, new BufferedReader(r));
+		in = new LookAheadBuffer(4, new BufferedReader(r));
 		lineNumber = 1;
 	}
 
@@ -147,7 +146,7 @@ public class Tokenizer implements Iterator<Token> {
 			addToken(TokenType.PLUS);
 			break;
 		case '-':
-			addToken(TokenType.MINUS);
+			lexMinus();
 			break;
 		case '*':
 			addToken(TokenType.TIMES);
@@ -163,6 +162,9 @@ public class Tokenizer implements Iterator<Token> {
 			break;
 		case '!':
 			consume('=', TokenType.NEQ);
+			break;
+		case '"':
+			lexStr();
 			break;
 		case 'T':
 			addToken(TokenType.TRUE);
@@ -180,16 +182,21 @@ public class Tokenizer implements Iterator<Token> {
 			consume('f', TokenType.IF);
 			break;
 		case 'n':
-			consume("ot", "Expected not", TokenType.NOT);
+			lexN();
 			break;
 		case 'v':
-			lexVar();
+			lexVar(false);
+			break;
+		case 'w':
+			lexWhile();
+		case '$':
+			lexVar(true);
 			break;
 		default:
 			if (Character.isLetter(c))
 				lexKeyword(c);
 			else if (Character.isDigit(c))
-				lexNum(c);
+				lexNum(c, true);
 			else
 				addErrorToken(String.format("Unrecognized character %c", c));
 		}
@@ -228,15 +235,46 @@ public class Tokenizer implements Iterator<Token> {
 		}
 	}
 	
-	private void lexVar() throws IOException {
-		consume("ar ", "Expected 'var [name]'");
+	private void lexVar(boolean usingDollar) throws IOException {
+		if (!usingDollar)
+			consume("ar ", "Expected 'var [name]'");
 		String n = "";
 		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != ';' && in.peek() != ')') {
 			n += Character.toString(in.next());
 		}
 		tokens.add(new Token.VarToken(n, lineNumber));
 	}
-
+	
+	private void lexMinus() throws IOException {
+		if (Character.isDigit(in.peek()))
+			lexNum(in.next(), false);
+		else
+			addToken(TokenType.MINUS);
+	}
+	
+	private void lexWhile() throws IOException {
+		consume("hile", "Expected while");
+		addToken(TokenType.WHILE);
+	}
+	
+	private void lexStr() throws IOException {
+		String n = "";
+		while (in.peek() != '"'&& in.peek() != LookAheadBuffer.EOF) {
+			n += Character.toString(in.next());
+		}
+		if (in.peek() == '"')
+			in.next();
+		tokens.add(new Token.StringToken(n, lineNumber));
+	}
+	
+	private void lexN() throws IOException {
+		consume("ot", "Expected not", TokenType.NOT);
+		
+//		if (in.peek() == 'o')
+//			consume("ot", "Expected not", TokenType.NOT);
+//		else
+//			consume("ull", "Expected null", TokenType.NULL);
+	}
 	/**
 	 * Lexes a division symbol '/'. May be the start of an end-of-line comment with
 	 * //, in which case the comment is ignored.
@@ -329,7 +367,7 @@ public class Tokenizer implements Iterator<Token> {
 	 * @throws IOException if an IOException was thrown when trying to read from the
 	 *                     source Reader
 	 */
-	private void lexNum(char c) throws IOException {
+	private void lexNum(char c, boolean isPos) throws IOException {
 		sb.setLength(0);
 		sb.append(c);
 		c = in.peek();
@@ -339,7 +377,8 @@ public class Tokenizer implements Iterator<Token> {
 		}
 		
 		try {
-			int val = Integer.parseInt(sb.toString());
+			long val = Long.parseLong(sb.toString());
+			val = isPos ? val : -val;
 			tokens.add(new Token.NumToken(val, lineNumber));
 			
 		} catch (NumberFormatException e) {

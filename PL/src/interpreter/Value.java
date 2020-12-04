@@ -4,11 +4,11 @@ public class Value {
 
 	private int[] type = { 0, 0, 0 };
 
-	private int intVal;
+	private long intVal;
 	private String stringVal;
 	private boolean boolVal;
 
-	public Value(int i) {
+	public Value(long i) {
 		intVal = i;
 		stringVal = "";
 		boolVal = false;
@@ -46,7 +46,7 @@ public class Value {
 		}
 	}
 
-	public int getInt() {
+	public long getInt() {
 		return intVal;
 	}
 
@@ -60,7 +60,7 @@ public class Value {
 
 	public String toString() {
 		if (type[0] == 1 && type[1] == 0 && type[2] == 0) {
-			return Integer.toString(intVal);
+			return String.valueOf(intVal);
 		} else if (type[0] == 0 && type[1] == 1 && type[2] == 0) {
 			return stringVal;
 		} else if (type[0] == 0 && type[1] == 0 && type[2] == 1) {

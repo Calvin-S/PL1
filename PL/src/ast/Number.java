@@ -3,19 +3,19 @@ package ast;
 /** A representation of the <Number> node. */
 public class Number extends AExpr {
 
-	private int value;
+	private long value;
 
 	/**
 	 * Creates a new Number representing the value of v.
 	 * 
 	 * @param v The value the Number represents.
 	 */
-	public Number(int v) {
+	public Number(long v) {
 		super();
 		value = v;
 	}
 
-	public int getNum() {
+	public long getNum() {
 		return value;
 	}
 
