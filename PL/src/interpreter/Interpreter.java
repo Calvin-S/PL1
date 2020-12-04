@@ -25,12 +25,14 @@ public class Interpreter {
 
 		// assuming the only children are exprs, no functions or anything yet.
 
-		// for(int i = 0; i<children.size(); i++) {
-		// evaluateExpr(children.get(i));
-		// }
+		for (int i = 0; i < children.size(); i++) {
+			evaluateExpr(children.get(i));
+		}
+
+		// what value to return?
 
 		// TEMPORARY
-		return evaluateExpr(children.get(0));
+		// return evaluateExpr(children.get(0));
 
 	}
 
