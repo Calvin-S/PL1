@@ -33,7 +33,7 @@ public class Parser{
 	public static Program parseProgram(Tokenizer t) throws SyntaxError {
 		Program p = new Program();
 		
-	    Expr e = parseExpr(t);    //assuming all Exprs are AExprs
+	    Seq e = parseSeq(t);    //assuming all Exprs are AExprs
 	    p.addNode(e);
   
 		return p;
@@ -42,21 +42,40 @@ public class Parser{
 	static int paren_count = 0;
 	static int brace_count = 0;
 	
+	public static Seq parseSeq(Tokenizer t) throws SyntaxError {
+		Seq s1 = new Seq();
+		s1.addToSeq(parseExpr(t));
+		while (!t.peek().getType().equals(TokenType.EOF)) {
+			s1.addToSeq(parseExpr(t));
+		}
+		return s1;
+	}
+	
+	public static Seq parseSeqCond(Tokenizer t) throws SyntaxError {
+		Seq s1 = new Seq();
+		s1.addToSeq(parseExpr(t));
+		while (!t.peek().getType().equals(TokenType.EOF) && !t.peek().getType().equals(TokenType.RBRACE)) {
+			s1.addToSeq(parseExpr(t));
+		}
+		return s1;
+	}
+	
 	public static Expr parseExpr(Tokenizer t) throws SyntaxError {
 		Expr e1;
 		if (t.peek().getType().equals(TokenType.SEMICOLON)) {
+			consume(t, TokenType.SEMICOLON);
 			return null;
 		} else if(t.peek().getType().equals(TokenType.LPAREN)){
 	        consume(t, TokenType.LPAREN);
 	        e1 = parseExpr(t);
 	        consume(t, TokenType.RPAREN);
-	    } else if (t.peek().getType().equals(TokenType.IF)) {  // IF statements
+	    } else if (t.peek().getType().equals(TokenType.IF)) {  // If, elif, else statements
 	    	consume(t, TokenType.IF);
 	    	consume(t, TokenType.LPAREN, "If statement guards need parenthesis");
 	    	Type g = parseBExpr(t);
 	    	consume(t, TokenType.RPAREN);
 	    	consume(t, TokenType.LBRACE, "If statements bodies need brackets");
-	    	Expr body = parseExpr(t);
+	    	Seq body = parseSeqCond(t);
 	    	consume(t, TokenType.RBRACE);
 	    	e1 = new If(g, body);
 	    	while (t.peek().getType().equals(TokenType.ELIF)) {
@@ -67,20 +86,27 @@ public class Parser{
 		    	g = parseBExpr(t);
 		    	consume(t, TokenType.RPAREN);
 		    	consume(t, TokenType.LBRACE, "Else if statements bodies need brackets");
-		    	Expr elifBody = parseExpr(t);
+		    	Seq elifBody = parseSeqCond(t);
 		    	consume(t, TokenType.RBRACE);
 		    	((If) e1).addBranch(g, elifBody);
 	    	}
 	    	if (t.peek().getType().equals(TokenType.ELSE)) {
 	    		consume(t, TokenType.ELSE);
 	    		consume(t, TokenType.LBRACE, "Else statement bodies need brackets");
-		    	Expr elseBody = parseExpr(t);
+		    	Seq elseBody = parseSeqCond(t);
 		    	consume(t, TokenType.RBRACE);
 	    		((If) e1).addBranch(new Bool(true), elseBody);
 	    	}
+		} else if (t.peek().getType().equals(TokenType.WHILE)) {
+			consume(t, TokenType.IF);
+	    	consume(t, TokenType.LPAREN, "While statement guard needs parenthesis");
+	    	e1 = new While(parseBExpr(t));
+	    	consume(t, TokenType.RPAREN);
+	    	consume(t,TokenType.LBRACE, "While statement needs a body using curly brackets");
+	    	((While) e1).addBranch(parseExpr(t));
+	    	consume(t,TokenType.LBRACE, "While statement body needs closing brackets");
 		} else if (t.peek().getType().equals(TokenType.VAR)) {  // Variables
-			String temp;
-			temp = t.next().toVarToken().getValue();
+			String temp = t.next().toVarToken().getValue();
 			if (t.peek().getType().equals(TokenType.ASSIGN)) {
 				consume(t, TokenType.ASSIGN);
 				e1 = new Var(temp, parseExpr(t));
@@ -92,6 +118,11 @@ public class Parser{
 	    	e1 = parseBExpr(t);
 	    } else if (t.peek().isNum()) {
 	    	e1 = parseAExpr(t);
+	    } else if (t.peek().isString()) {
+	    	String temp = t.next().toStringToken().getValue();
+	    	e1 = new Str(temp);
+	    } else if (t.peek().isNull()) {
+	    	e1 = new Null();
 	    } else{
 	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
 		};
@@ -121,7 +152,7 @@ public class Parser{
 	    	b1 = parseAExpr(t);
 	    } else if (t.peek().isVar()) {   
 			b1 = new Var(t.next().toVarToken().getValue(), null);
-			((Var) b1).isValue();
+			((Var) b1).setAsValue();
 			b1 = parseAExpr(t, b1);
 	    } else{
 	    	System.out.println(t.peek().getType());
@@ -233,12 +264,12 @@ public class Parser{
 	        paren_count--;
 	        consume(t, TokenType.RPAREN);
 	    } else if (t.peek().isNum()) {
-				int value = t.peek().toNumToken().getValue();
+				long value = t.peek().toNumToken().getValue();
 				a1 = new Number(value);
 	      consume(t, TokenType.NUM);
 	    } else if (t.peek().isVar()) {   
 			a1 = new Var(t.next().toVarToken().getValue(), null);
-			((Var) a1).isValue();
+			((Var) a1).setAsValue();
 	    } else{
 	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};
@@ -268,7 +299,7 @@ public class Parser{
 		if (t.peek().getType().equals(tt)) {
 			t.next();
 		} else
-			throw new SyntaxError("Syntax error on consuming " + tt.name() + " " + t.peek().getType());
+			throw new SyntaxError("Syntax error on consuming "+ t.peek().getType() + " Expected " + tt.name());
 	}
 	
 	public static void consume(Tokenizer t, TokenType tt, String err) throws SyntaxError {

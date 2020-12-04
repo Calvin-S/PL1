@@ -4,9 +4,9 @@ public class Bool extends BExpr{
 	private boolean value;
 
 	/**
-	 * Creates a new Number representing the value of v.
+	 * Creates a new Boolean representing the value of v.
 	 * 
-	 * @param v The value the Number represents.
+	 * @param v The value the bool represents.
 	 */
 	public Bool(boolean v) {
 		super();

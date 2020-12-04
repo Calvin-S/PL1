@@ -39,11 +39,14 @@ class Token {
         return lineNo;
     }
 
-    /**
-     * Determine whether this token is of number type.
-     *
-     * @return true if this token is of number type
-     */
+    boolean isType() {
+    	return isNum() || isBool() || isString() || isNull();
+    }
+    
+    boolean isNull() {
+        return type == TokenType.NULL;
+    }
+    
     boolean isNum() {
         return type == TokenType.NUM;
     }
@@ -94,7 +97,7 @@ class Token {
     static class NumToken extends Token {
 
         /** The int value this token represents. */
-        private final int value;
+        private final long value;
 
         /**
          * Constructs a new {@code NumToken} representing the integer value {@code v} on line {@code
@@ -105,7 +108,7 @@ class Token {
          *     lineNum > 0}. Note that a {@code NumToken} is not an error token, so the line number
          *     must be positive.
          */
-        NumToken(int v, int lineNum) {
+        NumToken(long v, int lineNum) {
             super(TokenType.NUM, lineNum);
             assert lineNum > 0 : "NumToken line number must be positive.";
             value = v;
@@ -116,13 +119,13 @@ class Token {
          *
          * @return the value of the number this token represents
          */
-        int getValue() {
+        long getValue() {
             return value;
         }
 
         @Override
         public String toString() {
-            return Integer.toString(value);
+            return String.valueOf(value);
         }
     }
     

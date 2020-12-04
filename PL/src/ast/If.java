@@ -4,16 +4,16 @@ import java.util.List;
 
 public class If extends Expr{
 	private ArrayList<Type> guards;
-	private ArrayList<Expr> branches;
+	private ArrayList<Seq> branches;
 	
-	public If(Type guard, Expr branch) {
+	public If(Type guard, Seq branch) {
 		guards = new ArrayList<Type>();
-		branches = new ArrayList<Expr>();
+		branches = new ArrayList<Seq>();
 		guards.add(guard);
 		branches.add(branch);
 	}
 	
-	public void addBranch(Type guard, Expr branch) {
+	public void addBranch(Type guard, Seq branch) {
 		assert guards != null && branches != null;
 		guards.add(guard);
 		branches.add(branch);
@@ -30,7 +30,7 @@ public class If extends Expr{
 
 	public List<Node> getBranches() {
 		List<Node> g = new ArrayList<Node>();
-		for (Expr b : branches) {
+		for (Seq b : branches) {
 			g.add(b);
 		}
 		return g;
@@ -38,9 +38,9 @@ public class If extends Expr{
 	
 	public String toString() {
 		assert guards != null && branches != null && guards.size() == branches.size();
-		String s = "{";
+		String s = "{\n";
 		for (int i = 0; i < branches.size(); i++) {
-			s += " If " + guards.get(i) + " then " + branches.get(i);
+			s += "If " + guards.get(i) + " then (" + branches.get(i) + ")\n";
 		}
 		s += "}";
 		return s;
@@ -58,7 +58,6 @@ public class If extends Expr{
 				sb.append("If " + guards.get(i) + " then " + branches.get(i));
 			else
 				sb.append("Else If " + guards.get(i) + " then " + branches.get(i));
-			sb.append("\n");
 		}
 		return sb;
 	} 

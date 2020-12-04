@@ -81,6 +81,7 @@ public class Interpreter {
 			}
 
 		} else {
+			System.out.println(n.getClass());
 			throw new SyntaxError("the tree I got cannot be evaluated. Please check me.");
 		}
 

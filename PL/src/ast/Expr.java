@@ -1,6 +1,6 @@
 package ast;
 
-public class Expr extends AbstractNode {
+public class Expr extends Seq {
 	/** An enumeration of all possible binary expression operators. */
 	public enum ExprOperator {
 		PLUS("+"), MINUS("-"), TIMES("*"), DIVIDE("/"), EXP("**"), 
