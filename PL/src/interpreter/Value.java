@@ -13,6 +13,7 @@ public class Value {
 		intVal = i;
 		stringVal = "";
 		boolVal = false;
+		nullVal = false;
 
 		type[0] = 1;
 	}
@@ -21,6 +22,7 @@ public class Value {
 		intVal = 0;
 		stringVal = "";
 		boolVal = false;
+		nullVal = false;
 
 		type[1] = 1;
 	}
@@ -29,6 +31,7 @@ public class Value {
 		intVal = 0;
 		stringVal = "";
 		boolVal = b;
+		nullVal = false;
 
 		type[2] = 1;
 	}

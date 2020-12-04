@@ -86,6 +86,24 @@ public class Interpreter {
 
 			return new Value();
 
+		} else if (n instanceof Seq) {
+
+			List<Expr> children = ((Seq) n).getSeq();
+
+			// assuming the only children are exprs, no functions or anything yet.
+
+			Value lastVal = null;
+
+			for (int i = 0; i < children.size(); i++) {
+				if (i == children.size() - 1) {
+					lastVal = evaluateExpr(children.get(i));
+				} else {
+					evaluateExpr(children.get(i));
+				}
+			}
+
+			return lastVal;
+
 		} else {
 			System.out.println(n.getClass());
 			throw new SyntaxError("the tree I got cannot be evaluated. Please check me.");
@@ -137,6 +155,10 @@ public class Interpreter {
 					i++;
 				}
 			}
+		}
+
+		if (toExecute == null) {
+			return new Value();
 		}
 
 		return evaluateExpr(toExecute);
