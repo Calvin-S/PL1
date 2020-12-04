@@ -13,7 +13,7 @@ import interpreter.Value;
 public class Main {
 	public static void main(String args[]) {
 		
-		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test1.txt");
+		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test3.txt");
 		Reader r = new BufferedReader(new InputStreamReader(in));
 
 		Parser parser = new Parser();

@@ -1,18 +1,21 @@
 # Vision
-We attempting to implement a fully working language based off of our own designs. We will start from pretty much scratch and build a lexer, parser, and evaluater for this language with very little starter code (the exceptions are the tokenizer and look-ahead-buffer). Currently our language implementation is a true blend of imperative and functional programming languages. All expressions return some value, meaning variables can be assigned to expressions such as If-statements, While-loops (Note higher order functions do not exist as of the current implementation). 
+We attempting to implement a fully working language based off of our own designs. We will start from pretty much scratch and build a lexer, parser, and evaluater for this language with very little starter code (the exceptions are the tokenizer and look-ahead-buffer). Currently our language implementation is a true blend of imperative and functional programming languages. All expressions return some value, meaning variables can be assigned to expressions such as If-statements, While-loops (Note higher order functions do not exist as of the current implementation). Our language also acts imperatively in the sense that expressions and assignments do change the program's state as there is no scoping within loops (aka everything acts as a global variable).
 
 ## Core features:
     - For and While Loops
-    - Variables - ints, strings, booleans
+    - Variables - ints, strings, booleans, expressions
     - String Manipulation - substring, reverse, concatenation
     - Ability to call and define functions
-    - Acts functionally as variables can be assigned to expressions
 
-One interesting feature of our language is that expressions will go all the way to the right like it does in lambda cCurrently all expressions return some value, meaning variables can be assigned to expressions such as If-statements, While-loops (Note higher order functions do not exist).
-alculus. An example of how our language interprets is shown below:
+
+### Right Associativity
+Our parser parses binary operators right associatively if the order precedences are the same. Examples of how our language interprets is shown below:
 ```
 not T or F --> not (T or F)
+
 4 + 2 - 3 + 1 --> 4 + (2 - (3 + 1))
+3 * 2 + 4 * 5 - 2 - 1 --> (3 * 2) + ((4 * 5) - (2 - 1))
+
 ```
 In our language, T is for true and F for false.
 

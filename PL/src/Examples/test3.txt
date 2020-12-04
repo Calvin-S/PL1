@@ -1,1 +1,2 @@
-not T and F
+$a = T
+not $a
