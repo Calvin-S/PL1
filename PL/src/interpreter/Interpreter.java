@@ -15,6 +15,7 @@ import ast.Program;
 import ast.Seq;
 import ast.Str;
 import ast.Var;
+import ast.While;
 
 public class Interpreter {
 
@@ -90,7 +91,25 @@ public class Interpreter {
 
 			return new Value();
 
-		} else if (n instanceof Seq) {
+		} else if (n instanceof While) {
+			While r = (While) n;
+			
+			Value v = evaluateExpr(r.getGuard());
+			if(v.getType().equals("bool")) {
+				Seq body = r.getBody();
+
+			
+				
+			}else {
+				throw new SyntaxError("Guard is not a boolean");
+			}
+			
+
+			
+			
+		
+			
+		}else { if (n instanceof Seq) {
 
 			List<Expr> children = ((Seq) n).getSeq();
 
