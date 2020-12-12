@@ -61,6 +61,12 @@ class Token {
     boolean isVar() {
     	return type == TokenType.VAR;
     }
+    boolean isFun() {
+    	return type == TokenType.FUN;
+    }
+    boolean isCall() {
+    	return type == TokenType.CALL;
+    }
     /**
      * Returns the number token associated with this Token.
      *
@@ -86,6 +92,20 @@ class Token {
     		return (VarToken) this;
     	}
     	throw new InputMismatchException("Token is not a var.");
+    }
+    
+    FunToken toFunToken() {
+    	if (isFun()) {
+    		return (FunToken) this;
+    	}
+    	throw new InputMismatchException("Token is not a fun.");
+    }
+    
+    CallToken toCallToken() {
+    	if (isCall()) {
+    		return (CallToken) this;
+    	}
+    	throw new InputMismatchException("Token is not a call.");
     }
 
     @Override
@@ -180,6 +200,76 @@ class Token {
          */
         VarToken(String v, int lineNum) {
             super(TokenType.VAR, lineNum);
+            assert lineNum > 0 : "VarToken line number must be positive.";
+            value = v;
+        }
+
+        /**
+         * Returns the value of the number this token represents.
+         *
+         * @return the value of the number this token represents
+         */
+        String getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+    
+    static class FunToken extends Token {
+
+        /** The string value this token represents. */
+        private final String value;
+
+        /**
+         * Constructs a new {@code NumToken} representing the String value {@code v} on line {@code
+         * lineNum}.
+         *
+         * @param v the String value this token represents
+         * @param lineNum The line number in the input file containing this token. Checks {@code
+         *     lineNum > 0}. Note that a {@code StringToken} is not an error token, so the line number
+         *     must be positive.
+         */
+        FunToken(String v, int lineNum) {
+            super(TokenType.FUN, lineNum);
+            assert lineNum > 0 : "VarToken line number must be positive.";
+            value = v;
+        }
+
+        /**
+         * Returns the value of the number this token represents.
+         *
+         * @return the value of the number this token represents
+         */
+        String getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+    }
+    
+    static class CallToken extends Token {
+
+        /** The string value this token represents. */
+        private final String value;
+
+        /**
+         * Constructs a new {@code NumToken} representing the String value {@code v} on line {@code
+         * lineNum}.
+         *
+         * @param v the String value this token represents
+         * @param lineNum The line number in the input file containing this token. Checks {@code
+         *     lineNum > 0}. Note that a {@code StringToken} is not an error token, so the line number
+         *     must be positive.
+         */
+        CallToken(String v, int lineNum) {
+            super(TokenType.CALL, lineNum);
             assert lineNum > 0 : "VarToken line number must be positive.";
             value = v;
         }

@@ -38,8 +38,12 @@ public enum TokenType {
     FOR(TC.COND, "for"),
     WHILE(TC.COND, "while"),
     
+    FUN(TC.FUNC, "fun"),
+    CALL(TC.FUNC, "call"),
+    
     ASSIGN(TC.OTHER, "="),
 	SEMICOLON(TC.OTHER, ";"),
+	COMMA(TC.OTHER, ","),
 	LBRACKET(TC.OTHER, "["),
     RBRACKET(TC.OTHER, "]"),
     LPAREN(TC.OTHER, "("),

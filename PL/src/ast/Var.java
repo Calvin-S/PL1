@@ -13,7 +13,10 @@ public class Var extends Type{
 	
 	@Override
 	public StringBuilder prettyPrint(StringBuilder sb) {
-		sb.append(name + " = ");
+		if (e == null)
+			sb.append(name);
+		else
+			sb.append(name + " = ");
 		if (e != null)
 			e.prettyPrint(sb);
 		return sb;

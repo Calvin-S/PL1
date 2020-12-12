@@ -81,6 +81,7 @@ public class Tokenizer implements Iterator<Token> {
 			try {
 				lexOneToken();
 			} catch (IOException e) {
+				System.out.println("ih");
 				throw new TokenizerIOException(e);
 			}
 		}
@@ -105,7 +106,6 @@ public class Tokenizer implements Iterator<Token> {
 	 *                     source Reader
 	 */
 	private void lexOneToken() throws IOException {
-
 		char c = in.next();
 		
 		// consume whitespace
@@ -178,6 +178,9 @@ public class Tokenizer implements Iterator<Token> {
 		case 'e':
 			lexE();
 			break;
+		case 'f':
+			lexf();
+			break;
 		case 'i':
 			consume('f', TokenType.IF);
 			break;
@@ -193,10 +196,14 @@ public class Tokenizer implements Iterator<Token> {
 		case '$':
 			lexVar(true);
 			break;
+		case '@':
+			lexCall();
+			break;
+		case ',':
+			addToken(TokenType.COMMA);
+			break;
 		default:
-			if (Character.isLetter(c))
-				lexKeyword(c);
-			else if (Character.isDigit(c))
+			if (Character.isDigit(c))
 				lexNum(c, true);
 			else
 				addErrorToken(String.format("Unrecognized character %c", c));
@@ -237,14 +244,33 @@ public class Tokenizer implements Iterator<Token> {
 		}
 	}
 	
+	private void lexf() throws IOException {
+		consume("un ", "Expected fun");
+		String n = "";
+		while (!Character.isWhitespace(in.peek()) && in.peek() != '(') {
+			n += Character.toString(in.next());
+		}
+		if (n.equals(""))
+			addErrorToken("Function has no name on line number " + lineNumber);
+		tokens.add(new Token.FunToken(n, lineNumber));
+	}
+	
 	private void lexVar(boolean usingDollar) throws IOException {
 		if (!usingDollar)
 			consume("ar ", "Expected 'var [name]'");
 		String n = "";
-		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != ';' && in.peek() != ')') {
+		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != ';' && in.peek() != ')' && in.peek() != '}') {
 			n += Character.toString(in.next());
 		}
 		tokens.add(new Token.VarToken(n, lineNumber));
+	}
+	
+	private void lexCall() throws IOException {
+		String n = "";
+		while (!Character.isWhitespace(in.peek()) && in.peek() != '(') {
+			n += Character.toString(in.next());
+		}
+		tokens.add(new Token.CallToken(n, lineNumber));
 	}
 	
 	private void lexMinus() throws IOException {
@@ -278,6 +304,7 @@ public class Tokenizer implements Iterator<Token> {
 			consume("ull", "Expected null", TokenType.NULL);
 		}
 	}
+	
 	/**
 	 * Lexes a division symbol '/'. May be the start of an end-of-line comment with
 	 * //, in which case the comment is ignored.
@@ -339,28 +366,6 @@ public class Tokenizer implements Iterator<Token> {
 		} else {
 			addToken(TokenType.GT);
 		}
-	}
-
-	/**
-	 * Lexes a keyword. May be called only when the previously read character is a
-	 * letter. Scans the keyword and finds it in the keyword table.
-	 *
-	 * @throws IOException if an IOException was thrown when trying to read from the
-	 *                     source Reader
-	 */
-	private void lexKeyword(char c) throws IOException {
-		sb.setLength(0);
-		sb.append(c);
-		c = in.peek();
-		while (Character.isLetter(c)) {
-			sb.append(c);
-			c = in.scanAndPeek();
-		}
-		TokenType tt = TokenType.getTypeFromString(sb.toString());
-		if (tt != null)
-			addToken(tt);
-		else
-			addErrorToken(String.format("Unrecognized keyword %s", sb.toString()));
 	}
 
 	/**

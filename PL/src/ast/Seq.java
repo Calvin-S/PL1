@@ -3,7 +3,7 @@ package ast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Seq extends AbstractNode{
+public class Seq extends Fun{
 	private List<Expr> sequence;
 	public Seq() {
 		sequence = new ArrayList<Expr>();

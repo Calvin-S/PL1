@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import ast.*;
 import ast.Expr.ExprOperator;
 import ast.Number;
@@ -31,22 +32,60 @@ public class Parser{
 	 * @throws SyntaxError if there the input tokens have invalid syntax
 	 */
 	public static Program parseProgram(Tokenizer t) throws SyntaxError {
-		Program p = new Program();
+//		Program p = new Program();
 		
-	    Seq e = parseSeq(t);    //assuming all Exprs are AExprs
-	    p.addNode(e);
-  
+//	    Seq e = parseSeq(t);    //assuming all Exprs are AExprs
+//	    p.addNode(e);
+		Program p = parseProg(t);
 		return p;
 	  }
 	
 	static int paren_count = 0;
 	static int brace_count = 0;
 	
+	public static Program parseProg(Tokenizer t) throws SyntaxError {
+		Program p1 = new Program();
+		while (!t.peek().getType().equals(TokenType.EOF)) {
+			p1.addNode(parseFun(t));
+		}
+		return p1;
+	}
+	public static Fun parseFun(Tokenizer t) throws SyntaxError {
+		Fun f1;
+		if (t.peek().getType().equals(TokenType.FUN)) {
+			String n = t.next().toFunToken().getValue();
+			consume(t, TokenType.LPAREN, "Function args need parenthesis");
+	    	ArrayList<Var> args = new ArrayList<Var>();
+	    	while (t.peek().getType().equals(TokenType.VAR)) {
+	    		String temp = t.next().toVarToken().getValue();
+	    		Var v1 = new Var(temp, null);
+				v1.setAsValue();
+				args.add(v1);
+				
+	    	}
+	    	f1 = new Fun(n, args);
+	    	consume(t, TokenType.RPAREN, "Function args missing closing parenthesis");
+	    	consume(t, TokenType.LBRACE, "Function body need brackets");
+	    	if (t.peek().getType().equals(TokenType.RBRACE))
+	    		throw new SyntaxError("Function body cannot be empty");
+	    	Seq body = parseSeqCond(t);
+	    	consume(t, TokenType.RBRACE, "Function body needs a closing bracket");
+	    	f1.assignSeq(body);
+		}
+		else {
+			f1 = new Fun();
+			f1.assignSeq(parseSeq(t));
+		}
+		return f1;
+	}
 	public static Seq parseSeq(Tokenizer t) throws SyntaxError {
 		Seq s1 = new Seq();
 		s1.addToSeq(parseExpr(t));
 		while (!t.peek().getType().equals(TokenType.EOF)) {
-			s1.addToSeq(parseExpr(t));
+			Expr temp = parseExpr(t);
+			s1.addToSeq(temp);
+//			System.out.println(temp + "??");
+//			System.out.println(t.peek() + "!!");
 		}
 		return s1;
 	}
@@ -97,7 +136,11 @@ public class Parser{
 		    	consume(t, TokenType.RBRACE, "Else statement bodies needs a closing bracket");
 	    		((If) e1).addBranch(new Bool(true), elseBody);
 	    	}
-		} else if (t.peek().getType().equals(TokenType.WHILE)) {
+		} else if (t.peek().getType().equals(TokenType.CALL)) {
+			String f = t.next().toCallToken().getValue();
+			System.out.println(f);
+			e1 = new Call(f);
+	    } else if (t.peek().getType().equals(TokenType.WHILE)) {
 			consume(t, TokenType.WHILE);
 	    	consume(t, TokenType.LPAREN, "While statement guard needs parenthesis");
 	    	e1 = new While(parseBExpr(t));
@@ -276,7 +319,6 @@ public class Parser{
 	
 	public static Type parseAExpr(Tokenizer t, Type b) throws SyntaxError{
 		Type a1 = b;
-		
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
 			if (paren_count <= 0)
 				throw new SyntaxError("Parenthesis Mismatch on line " + t.lineNumber());
@@ -350,6 +392,8 @@ public class Parser{
 	}
 	
 	public static void consume(Tokenizer t, TokenType tt, String err) throws SyntaxError {
+		if (t.peek().getType().equals(TokenType.ERROR))
+			System.out.println(t.peek());
 		if (tt.equals(TokenType.LPAREN))
         	paren_count++;
 		else if (tt.equals(TokenType.RPAREN))

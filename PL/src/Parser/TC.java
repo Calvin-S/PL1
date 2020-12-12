@@ -1,6 +1,6 @@
 package Parser;
 public enum TC {
-	BINOP, BOP, STRING, COND, VALUES, OTHER;
+	BINOP, BOP, STRING, COND, VALUES, FUNC, OTHER;
 } 
 /**
  *  BINOP for + - * /
