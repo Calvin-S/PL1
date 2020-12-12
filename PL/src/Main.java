@@ -5,8 +5,8 @@ import java.io.Reader;
 import java.util.HashMap;
 
 import Parser.Parser;
-import Parser.SyntaxError;
 import ast.Program;
+import interpreter.EvaluationError;
 import interpreter.Interpreter;
 import interpreter.Value;
 
