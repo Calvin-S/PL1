@@ -33,7 +33,7 @@ public class Fun extends AbstractNode{
 				v.prettyPrint(sb);
 			else {
 				v.prettyPrint(sb);
-				sb.append(", ");
+				sb.append(" ");
 			}
 		}
 		sb.append(")\n[");

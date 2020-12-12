@@ -138,8 +138,16 @@ public class Parser{
 	    	}
 		} else if (t.peek().getType().equals(TokenType.CALL)) {
 			String f = t.next().toCallToken().getValue();
-			System.out.println(f);
 			e1 = new Call(f);
+			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
+			if (!t.peek().getType().equals(TokenType.RPAREN))
+				((Call) e1).addArg(parseBExpr(t));
+			while (t.peek().getType().equals(TokenType.COMMA)) {
+				consume(t, TokenType.COMMA, "Function arguments should be separated by comma");
+				Type temp = parseBExpr(t);
+				((Call) e1).addArg(temp);
+			}
+			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
 	    } else if (t.peek().getType().equals(TokenType.WHILE)) {
 			consume(t, TokenType.WHILE);
 	    	consume(t, TokenType.LPAREN, "While statement guard needs parenthesis");
