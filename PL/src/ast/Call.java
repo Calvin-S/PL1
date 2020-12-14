@@ -24,9 +24,10 @@ public class Call extends Expr{
 	@Override
 	public StringBuilder prettyPrint(StringBuilder sb) {
 		sb.append("@" + funToCall + "(");
-		for (Type e : args) {
-			e.prettyPrint(sb);
-			sb.append(" ");
+		for (int i = 0; i < args.size(); i++) {
+			args.get(i).prettyPrint(sb);
+			if (i < args.size() - 1)
+				sb.append(", ");
 		}
 		sb.append(")");
 		return sb;
