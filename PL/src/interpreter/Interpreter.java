@@ -5,7 +5,9 @@ import java.util.List;
 
 import ast.BExpr;
 import ast.Bool;
+import ast.Call;
 import ast.Expr;
+import ast.Fun;
 import ast.If;
 import ast.Node;
 import ast.Null;
@@ -19,16 +21,38 @@ import ast.While;
 public class Interpreter {
 
 	private HashMap<String, Value> store = null;
+	private HashMap<String, Fun> functions = null;
 
 	public Interpreter() {
 		store = new HashMap<String, Value>();
+		functions = new HashMap<String, Fun>();
+	}
+
+	public Interpreter(HashMap<String, Value> parameters) {
+		store = new HashMap<String, Value>();
+		functions = new HashMap<String, Fun>();
+		for (String key : parameters.keySet()) {
+			store.put(key, parameters.get(key));
+		}
 	}
 
 	public Value evaluateProg(Program p) throws EvaluationError {
-		Seq seq = (Seq) p.getChildren().get(0);
-		List<Expr> children = seq.getSeq();
+		List<Node> funs = p.getChildren();
 
-		// assuming the only children are exprs, no functions or anything yet.
+		Fun main = (Fun) funs.get(funs.size() - 1);
+
+		for (int i = 0; i < funs.size(); i++) {
+			Fun currentFun = (Fun) funs.get(i);
+			functions.put(currentFun.getName(), currentFun);
+
+			if (currentFun.isMain()) {
+				main = currentFun;
+			}
+		}
+
+		Seq seq = main.getBody();
+
+		List<Expr> children = seq.getSeq();
 
 		Value lastVal = null;
 
@@ -43,10 +67,26 @@ public class Interpreter {
 		return lastVal;
 
 		// what value to return?
+	}
 
-		// TEMPORARY
-		// return evaluateExpr(children.get(0));
+	public Value evaluateFun(Fun p) throws EvaluationError {
+		Seq seq = p.getBody();
 
+		List<Expr> children = seq.getSeq();
+
+		Value lastVal = null;
+
+		for (int i = 0; i < children.size(); i++) {
+			if (i == children.size() - 1) {
+				lastVal = evaluateExpr(children.get(i));
+			} else {
+				evaluateExpr(children.get(i));
+			}
+		}
+
+		return lastVal;
+
+		// what value to return?
 	}
 
 	public HashMap<String, Value> getStore() {
@@ -133,7 +173,35 @@ public class Interpreter {
 
 			return lastVal;
 
-		} else {
+		} else if (n instanceof Call){
+			Call r = (Call) n;
+			
+			String funName = r.getName();
+			List<ast.Type> args = r.getArguments();
+			
+			Fun fun = functions.get(funName);
+			
+			if(fun == null){
+				throw new EvaluationError("You are trying to call a function that has not been defined");
+			}
+			
+			List<Var> parameters = fun.getArgs();
+	
+			if(args.size() != parameters.size()) {
+				throw new EvaluationError("The number of arguments you gave does not match how many the function needs.");
+			}
+			
+			HashMap<String, Value> passAlongParams = new HashMap<String, Value>();
+			
+			for(int i = 0; i<args.size(); i++) {
+				passAlongParams.put(parameters.get(i).getName(), evaluateExpr(args.get(i)));
+
+			}
+			
+			Interpreter funcInterpret = new Interpreter(passAlongParams);
+			return funcInterpret.evaluateFun(fun);
+			
+		}else {
 			System.out.println(n.getClass());
 			throw new EvaluationError("the tree I got cannot be evaluated. Please check me.");
 		}

@@ -13,6 +13,14 @@ public class Call extends Expr{
 		args.add(a);
 	}
 	
+	public String getFuncName() {
+		return funToCall;
+	}
+
+	public ArrayList<Type> getArguments() {
+		return args;
+	}
+
 	@Override
 	public StringBuilder prettyPrint(StringBuilder sb) {
 		sb.append("@" + funToCall + "(");
