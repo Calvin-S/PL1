@@ -205,6 +205,7 @@ public class Parser{
 	        s1 = parseBExpr(t);
 	        consume(t, TokenType.RPAREN);
 		} else if (t.peek().getType().equals(TokenType.REVERSE)) {
+			consume(t, TokenType.REVERSE);
 			s1 = new StrExpr(parseStrExpr(t));
 		} else if (t.peek().isString()) {
 			s1 = new Str(t.next().toStringToken().getValue());
