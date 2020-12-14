@@ -118,6 +118,10 @@ public class Interpreter {
 			BExpr b = (BExpr) n;
 			return evaluateBExpr(b);
 
+		} else if (n instanceof StrExpr) {
+			StrExpr b = (StrExpr) n;
+			return evaluateStrExpr(b);
+
 		} else if (n instanceof Str) {
 
 			Str r = (Str) n;
@@ -281,6 +285,39 @@ public class Interpreter {
 		}
 
 		return evaluateExpr(toExecute);
+	}
+
+	public Value evaluateStrExpr(StrExpr b) throws EvaluationError {
+
+		if (b.getOperator().equals("~")) {
+
+			Value v = evaluateExpr(b.getChildren().get(1));
+
+			if (v.getType().equals("string")) {
+				StringBuilder revStr = new StringBuilder();
+				revStr.append(v.getString());
+				return new Value(revStr.reverse().toString());
+			} else {
+				throw new EvaluationError("calling reverse (~) on something that is not a string");
+			}
+
+		} else if (b.getOperator().equals("+")) {
+			Value v1 = evaluateExpr(b.getChildren().get(0));
+			Value v2 = evaluateExpr(b.getChildren().get(1));
+
+			if (v1.getType().equals("string") && v2.getType().equals("string")) {
+				return new Value(v1.getString() + v2.getString());
+			} else if (v1.getType().equals("string") && v2.getType().equals("int")) {
+				return new Value(v1.getString() + Long.toString(v2.getInt()));
+			} else if (v1.getType().equals("int") && v2.getType().equals("string")) {
+				return new Value(Long.toString(v1.getInt()) + v2.getString());
+			} else {
+				throw new EvaluationError("trying to concatenate one or more things that are not strings/ints");
+			}
+		} else {
+			throw new EvaluationError("invalid operator");
+		}
+
 	}
 
 	public Value evaluateBExpr(BExpr b) throws EvaluationError {
