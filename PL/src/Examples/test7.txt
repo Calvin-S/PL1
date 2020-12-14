@@ -1,1 +1,1 @@
-~"ASDF" + "GSAD"
+(T or F) and T

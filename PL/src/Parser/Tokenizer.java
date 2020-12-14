@@ -187,6 +187,9 @@ public class Tokenizer implements Iterator<Token> {
 		case 'n':
 			lexN();
 			break;
+		case 'o':
+			consume('r', TokenType.OR);
+			break;
 		case 'v':
 			lexVar(false);
 			break;
@@ -204,6 +207,9 @@ public class Tokenizer implements Iterator<Token> {
 			break;
 		case '~':
 			addToken(TokenType.REVERSE);
+			break;
+		case '^':
+			addToken(TokenType.CONCAT);
 			break;
 		default:
 			if (Character.isDigit(c))

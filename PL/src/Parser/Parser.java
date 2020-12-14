@@ -109,6 +109,10 @@ public class Parser{
 	        consume(t, TokenType.LPAREN);
 	        e1 = parseExpr(t);
 	        consume(t, TokenType.RPAREN);
+	        if (t.peek().getType().equals(TokenType.CONCAT))
+	        	e1 = parseStrExpr1(t, (Type)e1);
+	        else if (!t.peek().getType().equals(TokenType.NOT) && (t.peek().getType().category().equals(TC.BINOP) || t.peek().getType().category().equals(TC.BOP)))
+	        	e1 = parseBExpr1(t, (Type)e1);
 	    } else if (t.peek().getType().equals(TokenType.IF)) {  // If, elif, else statements
 	    	consume(t, TokenType.IF);
 	    	consume(t, TokenType.LPAREN, "If statement guards need parenthesis");
@@ -202,7 +206,7 @@ public class Parser{
 		Type s1;
 		if (t.peek().getType().equals(TokenType.LPAREN)) {
 			consume(t, TokenType.LPAREN);
-	        s1 = parseBExpr(t);
+	        s1 = parseStrExpr(t);
 	        consume(t, TokenType.RPAREN);
 		} else if (t.peek().getType().equals(TokenType.REVERSE)) {
 			consume(t, TokenType.REVERSE);
@@ -212,10 +216,19 @@ public class Parser{
 		} else {
 			throw new SyntaxError("Assigning String failed on line " + t.lineNumber());
 		}
-		
-		if (t.peek().getType().equals(TokenType.PLUS)) {
-			consume(t, TokenType.PLUS);
-			s1 = new StrExpr(s1, ExprOperator.PLUS, parseStrExpr(t));
+		System.out.println(s1 + "\n" + t.peek());
+		if (t.peek().getType().equals(TokenType.CONCAT)) {
+			consume(t, TokenType.CONCAT);
+			s1 = new StrExpr(s1, ExprOperator.CONCAT, parseStrExpr(t));
+		}
+		return s1;
+	}
+	
+	public static Type parseStrExpr1(Tokenizer t, Type temp) throws SyntaxError {
+		Type s1 = temp;
+		if (t.peek().getType().equals(TokenType.CONCAT)) {
+			consume(t, TokenType.CONCAT);
+			s1 = new StrExpr(s1, ExprOperator.CONCAT, parseStrExpr(t));
 		}
 		return s1;
 	}
