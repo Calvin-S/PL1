@@ -301,6 +301,12 @@ public class Interpreter {
 
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() + v2.getInt());
+			} else if (v1.getType().equals("string") && v2.getType().equals("string")) {
+				return new Value(v1.getString() + v2.getString());
+			} else if (v1.getType().equals("string") && v2.getType().equals("int")) {
+				return new Value(v1.getString() + Long.toString(v2.getInt()));
+			} else if (v1.getType().equals("int") && v2.getType().equals("string")) {
+				return new Value(Long.toString(v1.getInt()) + v2.getString());
 			} else {
 				throw new EvaluationError("trying to add one or more things that are not ints");
 			}
