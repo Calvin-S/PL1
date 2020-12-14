@@ -15,6 +15,7 @@ import ast.Number;
 import ast.Program;
 import ast.Seq;
 import ast.Str;
+import ast.StrExpr;
 import ast.Var;
 import ast.While;
 
@@ -301,7 +302,7 @@ public class Interpreter {
 				throw new EvaluationError("calling reverse (~) on something that is not a string");
 			}
 
-		} else if (b.getOperator().equals("+")) {
+		} else if (b.getOperator().equals("^")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
 			Value v2 = evaluateExpr(b.getChildren().get(1));
 
