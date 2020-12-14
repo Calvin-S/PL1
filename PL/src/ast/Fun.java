@@ -22,6 +22,18 @@ public class Fun extends AbstractNode{
 		body = s;
 	}
 	
+	public Seq getBody() {
+		return body;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public List<Var> getArgs() {
+		return args;
+	}
+
 	public boolean isMain() {return isMain;}
 	
 	@Override
