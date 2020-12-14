@@ -186,9 +186,8 @@ public class Parser{
 	    	e1 = parseBExpr(t);
 	    } else if (t.peek().isNum()) {
 	    	e1 = parseAExpr(t);
-	    } else if (t.peek().isString()) {
-	    	String temp = t.next().toStringToken().getValue();
-	    	e1 = new Str(temp);
+	    } else if (t.peek().isString() || t.peek().getType().equals(TokenType.REVERSE)) {
+	    	e1 = parseStrExpr(t);
 	    } else if (t.peek().isNull()) {
 	    	consume(t, TokenType.NULL);
 	    	e1 = new Null();
@@ -197,6 +196,27 @@ public class Parser{
 	    	throw new SyntaxError("Parsing Expression failed on line " + t.lineNumber());
 		};
 		return e1;
+	}
+	
+	public static Type parseStrExpr(Tokenizer t) throws SyntaxError {
+		Type s1;
+		if (t.peek().getType().equals(TokenType.LPAREN)) {
+			consume(t, TokenType.LPAREN);
+	        s1 = parseBExpr(t);
+	        consume(t, TokenType.RPAREN);
+		} else if (t.peek().getType().equals(TokenType.REVERSE)) {
+			s1 = new StrExpr(parseStrExpr(t));
+		} else if (t.peek().isString()) {
+			s1 = new Str(t.next().toStringToken().getValue());
+		} else {
+			throw new SyntaxError("Assigning String failed on line " + t.lineNumber());
+		}
+		
+		if (t.peek().getType().equals(TokenType.PLUS)) {
+			consume(t, TokenType.PLUS);
+			s1 = new StrExpr(s1, ExprOperator.PLUS, parseStrExpr(t));
+		}
+		return s1;
 	}
 	
 	public static Type parseBExpr(Tokenizer t) throws SyntaxError{

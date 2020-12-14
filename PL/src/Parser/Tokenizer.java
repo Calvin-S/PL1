@@ -202,6 +202,9 @@ public class Tokenizer implements Iterator<Token> {
 		case ',':
 			addToken(TokenType.COMMA);
 			break;
+		case '~':
+			addToken(TokenType.REVERSE);
+			break;
 		default:
 			if (Character.isDigit(c))
 				lexNum(c, true);

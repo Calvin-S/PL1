@@ -3,21 +3,19 @@ package ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.Expr.ExprOperator;
 
-public class BExpr extends Type{
-	
+public class StrExpr extends Type{
 	private ExprOperator operator;
 	private Type left, right;
-
-	protected BExpr() {} // For bool
 	
-	public BExpr(Type not) {
-		operator = ExprOperator.NOT;
-		right = not;
+	public StrExpr(Type rev) {
+		operator = ExprOperator.REV;
+		right = rev;
 		left = null;
 	}
 
-	public BExpr(Type l, ExprOperator op, Type r) {
+	public StrExpr(Type l, ExprOperator op, Type r) {
 		left = l;
 		operator = op;
 		right = r;
@@ -53,6 +51,6 @@ public class BExpr extends Type{
 	} 
 	
 	public String nodeType() {
-		return "BExpr";
+		return "StrExpr";
 	}
 }
