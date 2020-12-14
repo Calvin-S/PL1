@@ -202,6 +202,9 @@ public class Tokenizer implements Iterator<Token> {
 		case ',':
 			addToken(TokenType.COMMA);
 			break;
+		case '~':
+			addToken(TokenType.REVERSE);
+			break;
 		default:
 			if (Character.isDigit(c))
 				lexNum(c, true);
@@ -259,7 +262,7 @@ public class Tokenizer implements Iterator<Token> {
 		if (!usingDollar)
 			consume("ar ", "Expected 'var [name]'");
 		String n = "";
-		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != ';' && in.peek() != ')' && in.peek() != '}') {
+		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != ';' && in.peek() != ')' && in.peek() != '}' && in.peek() != ',') {
 			n += Character.toString(in.next());
 		}
 		tokens.add(new Token.VarToken(n, lineNumber));

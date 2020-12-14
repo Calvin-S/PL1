@@ -1,4 +1,5 @@
-$a = T
-$c = 2
-$d = $b = $c
-$e = $a and $d
+fun fibb ($a)
+ {if ($a < 1) {0} elif ($a <= 2) {1} 
+ else { @fibb($a - 1) + @fibb($a - 2)}}
+ // 1 1 2 3 5 8 13 ... 233!
+@fibb(13)

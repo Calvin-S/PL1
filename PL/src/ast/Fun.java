@@ -30,7 +30,7 @@ public class Fun extends AbstractNode{
 		return name;
 	}
 
-	public List<Var> getArgs() {
+	public List<Var> getParam() {
 		return args;
 	}
 
@@ -47,7 +47,7 @@ public class Fun extends AbstractNode{
 		if (!isMain)
 			sb.append(")\n[");
 		else
-			sb.append(")");
+			sb.append(")\n");
 		body.prettyPrint(sb);
 		if (sb.charAt(sb.length() - 1) == '\n')
 			sb.setLength(sb.length() - 1);

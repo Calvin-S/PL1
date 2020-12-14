@@ -35,6 +35,15 @@ public class Interpreter {
 			store.put(key, parameters.get(key));
 		}
 	}
+	
+	public Interpreter(HashMap<String, Value> parameters, Fun fun) {
+		store = new HashMap<String, Value>();
+		functions = new HashMap<String, Fun>();
+		for (String key : parameters.keySet()) {
+			store.put(key, parameters.get(key));
+		}
+		functions.put(fun.getName(), fun);
+	}
 
 	public Value evaluateProg(Program p) throws EvaluationError {
 		List<Node> funs = p.getChildren();
@@ -53,9 +62,7 @@ public class Interpreter {
 		Seq seq = main.getBody();
 
 		List<Expr> children = seq.getSeq();
-
 		Value lastVal = null;
-
 		for (int i = 0; i < children.size(); i++) {
 			if (i == children.size() - 1) {
 				lastVal = evaluateExpr(children.get(i));
@@ -95,7 +102,7 @@ public class Interpreter {
 
 	// evaluates a SINGLE line, not a whole program
 	public Value evaluateExpr(Node n) throws EvaluationError {
-
+		
 		if (n instanceof Number) {
 
 			Number r = (Number) n;
@@ -134,6 +141,32 @@ public class Interpreter {
 
 			return new Value();
 
+		} else if (n instanceof Call){
+			Call r = (Call) n;
+			String funName = r.getFuncName();
+			List<ast.Type> args = r.getArguments();
+			
+			Fun fun = functions.get(funName);
+			
+			if(fun == null){
+				throw new EvaluationError("You are trying to call a function that has not been defined");
+			}
+			List<Var> parameters = fun.getParam();
+	
+			if(args.size() != parameters.size()) {
+				throw new EvaluationError("The number of arguments you gave does not match how many the function needs.");
+			}
+			
+			HashMap<String, Value> passAlongParams = new HashMap<String, Value>();
+			
+			for(int i = 0; i<args.size(); i++) {
+				passAlongParams.put(parameters.get(i).getName(), evaluateExpr(args.get(i)));
+
+			}
+			
+			Interpreter funcInterpret = new Interpreter(passAlongParams, fun);
+			return funcInterpret.evaluateFun(fun);
+			
 		} else if (n instanceof While) {
 			While r = (While) n;
 			
@@ -177,39 +210,21 @@ public class Interpreter {
 
 			return lastVal;
 
-		} else if (n instanceof Call){
-			Call r = (Call) n;
-			
-			String funName = r.getName();
-			List<ast.Type> args = r.getArguments();
-			
-			Fun fun = functions.get(funName);
-			
-			if(fun == null){
-				throw new EvaluationError("You are trying to call a function that has not been defined");
-			}
-			
-			List<Var> parameters = fun.getArgs();
-	
-			if(args.size() != parameters.size()) {
-				throw new EvaluationError("The number of arguments you gave does not match how many the function needs.");
-			}
-			
-			HashMap<String, Value> passAlongParams = new HashMap<String, Value>();
-			
-			for(int i = 0; i<args.size(); i++) {
-				passAlongParams.put(parameters.get(i).getName(), evaluateExpr(args.get(i)));
-
-			}
-			
-			Interpreter funcInterpret = new Interpreter(passAlongParams);
-			return funcInterpret.evaluateFun(fun);
-			
-		}else {
+		} else {
 			System.out.println(n.getClass());
 			throw new EvaluationError("the tree I got cannot be evaluated. Please check me.");
 		}
 
+	}
+	
+	public void printStore() {
+		if (store != null) {
+			for (String key : store.keySet()) {
+				System.out.println(key + " : " + store.get(key));
+			}
+		} else {
+			System.out.println("store was never initialized");
+		}
 	}
 
 	public Value evaluateVal(Var r) throws EvaluationError {
@@ -218,13 +233,14 @@ public class Interpreter {
 
 			if (store.containsKey(r.getName())) {
 				Value v = store.get(r.getName());
-
 				if (v == null) {
 					throw new EvaluationError("this variable does not have a value");
 				}
 
 				return store.get(r.getName());
 			} else {
+				printStore();
+				System.out.println(r.getName());
 				throw new EvaluationError("this variable does not exist");
 			}
 

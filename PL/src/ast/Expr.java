@@ -5,7 +5,8 @@ public class Expr extends Seq {
 	public enum ExprOperator {
 		PLUS("+"), MINUS("-"), TIMES("*"), DIVIDE("/"), EXP("**"), 
 		AND("and"), OR("or"), NOT("not"), EQ("=="), NEQ("!="), 
-		GT(">"), LT ("<"), GTE(">="), LTE("<=");
+		GT(">"), LT ("<"), GTE(">="), LTE("<="), 
+		REV("~");
 
 		private final String stringRep;
 

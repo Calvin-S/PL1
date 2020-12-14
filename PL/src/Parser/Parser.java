@@ -61,7 +61,8 @@ public class Parser{
 	    		Var v1 = new Var(temp, null);
 				v1.setAsValue();
 				args.add(v1);
-				
+				if (t.peek().getType().equals(TokenType.COMMA))
+					consume(t, TokenType.COMMA);
 	    	}
 	    	f1 = new Fun(n, args);
 	    	consume(t, TokenType.RPAREN, "Function args missing closing parenthesis");
@@ -158,6 +159,7 @@ public class Parser{
 				}
 			}
 			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
+			e1 = parseBExpr1(t, (Call)e1);
 	    } else if (t.peek().getType().equals(TokenType.WHILE)) {
 			consume(t, TokenType.WHILE);
 	    	consume(t, TokenType.LPAREN, "While statement guard needs parenthesis");
@@ -184,9 +186,8 @@ public class Parser{
 	    	e1 = parseBExpr(t);
 	    } else if (t.peek().isNum()) {
 	    	e1 = parseAExpr(t);
-	    } else if (t.peek().isString()) {
-	    	String temp = t.next().toStringToken().getValue();
-	    	e1 = new Str(temp);
+	    } else if (t.peek().isString() || t.peek().getType().equals(TokenType.REVERSE)) {
+	    	e1 = parseStrExpr(t);
 	    } else if (t.peek().isNull()) {
 	    	consume(t, TokenType.NULL);
 	    	e1 = new Null();
@@ -195,6 +196,27 @@ public class Parser{
 	    	throw new SyntaxError("Parsing Expression failed on line " + t.lineNumber());
 		};
 		return e1;
+	}
+	
+	public static Type parseStrExpr(Tokenizer t) throws SyntaxError {
+		Type s1;
+		if (t.peek().getType().equals(TokenType.LPAREN)) {
+			consume(t, TokenType.LPAREN);
+	        s1 = parseBExpr(t);
+	        consume(t, TokenType.RPAREN);
+		} else if (t.peek().getType().equals(TokenType.REVERSE)) {
+			s1 = new StrExpr(parseStrExpr(t));
+		} else if (t.peek().isString()) {
+			s1 = new Str(t.next().toStringToken().getValue());
+		} else {
+			throw new SyntaxError("Assigning String failed on line " + t.lineNumber());
+		}
+		
+		if (t.peek().getType().equals(TokenType.PLUS)) {
+			consume(t, TokenType.PLUS);
+			s1 = new StrExpr(s1, ExprOperator.PLUS, parseStrExpr(t));
+		}
+		return s1;
 	}
 	
 	public static Type parseBExpr(Tokenizer t) throws SyntaxError{
@@ -225,6 +247,28 @@ public class Parser{
 			b1 = new Var(t.next().toVarToken().getValue(), null);
 			((Var) b1).setAsValue();
 			b1 = parseAExpr(t, b1);
+	    } else if (t.peek().getType().equals(TokenType.CALL)) {
+			String f = t.next().toCallToken().getValue();
+			b1 = new Call(f);
+			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
+			if (!t.peek().getType().equals(TokenType.RPAREN))
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) b1).addArg(s);
+				} else {
+				((Call) b1).addArg(parseBExpr(t));
+				}
+			while (t.peek().getType().equals(TokenType.COMMA)) {
+				consume(t, TokenType.COMMA, "Function arguments should be separated by comma");
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) b1).addArg(s);
+				} else {
+				Type temp = parseBExpr(t);
+				((Call) b1).addArg(temp);
+				}
+			}
+			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
 	    } else{
 	    	System.out.println(t.peek().getType());
 	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
@@ -369,6 +413,28 @@ public class Parser{
 	    } else if (t.peek().isVar()) {   
 			a1 = new Var(t.next().toVarToken().getValue(), null);
 			((Var) a1).setAsValue();
+	    } else if (t.peek().getType().equals(TokenType.CALL)) {
+			String f = t.next().toCallToken().getValue();
+			a1 = new Call(f);
+			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
+			if (!t.peek().getType().equals(TokenType.RPAREN))
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) a1).addArg(s);
+				} else {
+				((Call) a1).addArg(parseBExpr(t));
+				}
+			while (t.peek().getType().equals(TokenType.COMMA)) {
+				consume(t, TokenType.COMMA, "Function arguments should be separated by comma");
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) a1).addArg(s);
+				} else {
+				Type temp = parseBExpr(t);
+				((Call) a1).addArg(temp);
+				}
+			}
+			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
 	    } else{
 	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};

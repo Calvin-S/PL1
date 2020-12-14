@@ -1,7 +1,7 @@
 package ast;
 import java.util.ArrayList;
 
-public class Call extends Expr{
+public class Call extends Type{
 	String funToCall;
 	ArrayList<Type> args;
 	public Call(String f) {
