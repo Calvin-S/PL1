@@ -61,7 +61,8 @@ public class Parser{
 	    		Var v1 = new Var(temp, null);
 				v1.setAsValue();
 				args.add(v1);
-				
+				if (t.peek().getType().equals(TokenType.COMMA))
+					consume(t, TokenType.COMMA);
 	    	}
 	    	f1 = new Fun(n, args);
 	    	consume(t, TokenType.RPAREN, "Function args missing closing parenthesis");
@@ -158,6 +159,7 @@ public class Parser{
 				}
 			}
 			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
+			e1 = parseBExpr1(t, (Call)e1);
 	    } else if (t.peek().getType().equals(TokenType.WHILE)) {
 			consume(t, TokenType.WHILE);
 	    	consume(t, TokenType.LPAREN, "While statement guard needs parenthesis");
@@ -225,6 +227,28 @@ public class Parser{
 			b1 = new Var(t.next().toVarToken().getValue(), null);
 			((Var) b1).setAsValue();
 			b1 = parseAExpr(t, b1);
+	    } else if (t.peek().getType().equals(TokenType.CALL)) {
+			String f = t.next().toCallToken().getValue();
+			b1 = new Call(f);
+			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
+			if (!t.peek().getType().equals(TokenType.RPAREN))
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) b1).addArg(s);
+				} else {
+				((Call) b1).addArg(parseBExpr(t));
+				}
+			while (t.peek().getType().equals(TokenType.COMMA)) {
+				consume(t, TokenType.COMMA, "Function arguments should be separated by comma");
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) b1).addArg(s);
+				} else {
+				Type temp = parseBExpr(t);
+				((Call) b1).addArg(temp);
+				}
+			}
+			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
 	    } else{
 	    	System.out.println(t.peek().getType());
 	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
@@ -369,6 +393,28 @@ public class Parser{
 	    } else if (t.peek().isVar()) {   
 			a1 = new Var(t.next().toVarToken().getValue(), null);
 			((Var) a1).setAsValue();
+	    } else if (t.peek().getType().equals(TokenType.CALL)) {
+			String f = t.next().toCallToken().getValue();
+			a1 = new Call(f);
+			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
+			if (!t.peek().getType().equals(TokenType.RPAREN))
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) a1).addArg(s);
+				} else {
+				((Call) a1).addArg(parseBExpr(t));
+				}
+			while (t.peek().getType().equals(TokenType.COMMA)) {
+				consume(t, TokenType.COMMA, "Function arguments should be separated by comma");
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) a1).addArg(s);
+				} else {
+				Type temp = parseBExpr(t);
+				((Call) a1).addArg(temp);
+				}
+			}
+			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
 	    } else{
 	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};
