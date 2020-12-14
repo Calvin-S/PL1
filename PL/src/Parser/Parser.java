@@ -141,11 +141,21 @@ public class Parser{
 			e1 = new Call(f);
 			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
 			if (!t.peek().getType().equals(TokenType.RPAREN))
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) e1).addArg(s);
+				} else {
 				((Call) e1).addArg(parseBExpr(t));
+				}
 			while (t.peek().getType().equals(TokenType.COMMA)) {
 				consume(t, TokenType.COMMA, "Function arguments should be separated by comma");
+				if (t.peek().getType().equals(TokenType.STRING)) {
+					Str s = new Str(t.next().toStringToken().getValue());
+					((Call) e1).addArg(s);
+				} else {
 				Type temp = parseBExpr(t);
 				((Call) e1).addArg(temp);
+				}
 			}
 			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
 	    } else if (t.peek().getType().equals(TokenType.WHILE)) {
@@ -181,8 +191,8 @@ public class Parser{
 	    	consume(t, TokenType.NULL);
 	    	e1 = new Null();
 	    } else{
-	    	System.out.println(t.peek());
-	    	throw new SyntaxError("Assigning Boolean Values failed on line " + t.lineNumber());
+	    	System.out.println("Parse error on char \'" + t.peek() + "\'");
+	    	throw new SyntaxError("Parsing Expression failed on line " + t.lineNumber());
 		};
 		return e1;
 	}

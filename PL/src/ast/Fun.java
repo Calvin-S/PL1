@@ -28,19 +28,19 @@ public class Fun extends AbstractNode{
 	public StringBuilder prettyPrint(StringBuilder sb) {
 		sb.append("Fun " + name + " (");
 		for (int i = 0; i < args.size(); i++) {
-			Var v = args.get(i);
-			if (i == args.size() - 1) 
-				v.prettyPrint(sb);
-			else {
-				v.prettyPrint(sb);
+			args.get(i).prettyPrint(sb);
+			if (i != args.size() - 1) 
 				sb.append(" ");
-			}
 		}
-		sb.append(")\n[");
+		if (!isMain)
+			sb.append(")\n[");
+		else
+			sb.append(")");
 		body.prettyPrint(sb);
 		if (sb.charAt(sb.length() - 1) == '\n')
 			sb.setLength(sb.length() - 1);
-		sb.append("]\n");
+		if (!isMain)
+			sb.append("]\n");
 		return sb;
 	}
 	

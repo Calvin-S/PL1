@@ -16,7 +16,7 @@ public class Str extends Type{
 	}
 
 	public String toString() {
-		return value;
+		return "\"" + value + "\"";
 	}
 	
 	@Override
