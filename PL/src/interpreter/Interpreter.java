@@ -1,5 +1,6 @@
 package interpreter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -125,6 +126,17 @@ public class Interpreter {
 
 			Bool r = (Bool) n;
 			return new Value(r.getBool());
+		} else if (n instanceof List) {
+
+			ast.List r = (ast.List) n;
+			ArrayList<Expr> items = r.getValues();
+
+			ArrayList<Value> vals = new ArrayList<Value>();
+			for (Expr item : items) {
+				vals.add(evaluateExpr(item));
+			}
+
+			return new Value(vals);
 
 		} else if (n instanceof BExpr) { // this will include AExpr instances right?
 
