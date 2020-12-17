@@ -171,6 +171,7 @@ public class Parser{
 			}
 			else if (t.peek().getType().equals(TokenType.PERIOD)) {
 				e1 = new Var(temp, null);
+				((Var) e1).isGlobal();
 			}
 			else {
 				e1 = new Var(temp, null);
