@@ -411,11 +411,13 @@ public class Interpreter {
 
 			if (r.getChild() != null) {
 				v = evaluateExpr(r.getChild());
-				if (store.containsKey(r.getName())) {
-					store.put(r.getName(), v);
-				} else {
+
+				if (r.isGlobal()) {
 					globalVars.put(r.getName(), v);
+				} else {
+					store.put(r.getName(), v);
 				}
+
 			} else {
 				v = new Value();
 				if (r.isGlobal()) {
