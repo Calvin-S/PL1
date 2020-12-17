@@ -38,14 +38,7 @@ public class If extends Expr{
 	
 	public String toString() {
 		assert guards != null && branches != null && guards.size() == branches.size();
-		String s = "{";
-		for (int i = 0; i < branches.size(); i++) {
-			s += "If " + guards.get(i) + " then (" + branches.get(i) + ")";
-			if (i != branches.size() - 1)
-				s += "\n";
-		}
-		s += "}";
-		return s;
+		return prettyPrint(new StringBuilder()).toString();
 	}
 	
 	public String nodeType() {

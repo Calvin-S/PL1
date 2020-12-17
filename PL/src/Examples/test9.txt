@@ -1,0 +1,1 @@
+match $x : int : $x + 1 str: ~$x
