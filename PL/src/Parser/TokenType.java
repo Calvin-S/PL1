@@ -33,7 +33,7 @@ public enum TokenType {
     NULL(TC.VALUES, "null"),
     
     INT(TC.TYPES, "int"),
-    STR(TC.TYPES, "str"),
+    STR(TC.TYPES, "string"),
     BOOL(TC.TYPES, "bool"),
     LIST(TC.TYPES, "list"),
     

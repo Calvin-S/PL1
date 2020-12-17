@@ -1,5 +1,6 @@
+$x = T
 match $x : 
 int : $x + 1
-str : $x ^ $x
-list : $x
+string : $x ^ $x
+list : insert($x,3)
 bool : if ($x) {not $x}

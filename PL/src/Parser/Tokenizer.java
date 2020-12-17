@@ -208,7 +208,7 @@ public class Tokenizer implements Iterator<Token> {
 			lexR();
 			break;
 		case 's':
-			consume("tr", "Expected str", TokenType.STR);
+			consume("tring", "Expected string", TokenType.STR);
 			break;
 		case 'v':
 			lexVar(false);
