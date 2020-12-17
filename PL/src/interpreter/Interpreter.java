@@ -225,6 +225,7 @@ public class Interpreter {
 	}
 	
 	public void printStore() {
+		System.out.println("Store Values:\n");
 		if (store != null) {
 			for (String key : store.keySet()) {
 				System.out.println(key + " : " + store.get(key));
@@ -232,20 +233,26 @@ public class Interpreter {
 		} else {
 			System.out.println("store was never initialized");
 		}
+		System.out.println("\nGlobal Var Store:\n");
+		if (globalVars != null) {
+			for (String key : globalVars.keySet()) {
+				System.out.println(key + " : " + globalVars.get(key));
+			}
+		} else {
+			System.out.println("store was never initialized");
+		}
 	}
 
 	public Value evaluateVal(Var r) throws EvaluationError {
-
 		if (r.isValue()) {
-
 			if (store.containsKey(r.getName())) {
 				Value v = store.get(r.getName());
 				if (v == null) {
 					throw new EvaluationError("this variable has not been assigned a value");
 				}
-
 				return store.get(r.getName());
 			} else if (globalVars.containsKey(r.getName())) {
+				
 				Value v = globalVars.get(r.getName());
 				if (v == null) {
 					throw new EvaluationError("this variable has not been assigned a value");
@@ -263,11 +270,10 @@ public class Interpreter {
 
 			if (r.getChild() != null) {
 				v = evaluateExpr(r.getChild());
-
-				if (r.isGlobal()) {
-					globalVars.put(r.getName(), v);
-				} else {
+				if (store.containsKey(r.getName())) {
 					store.put(r.getName(), v);
+				} else {
+					globalVars.put(r.getName(), v);
 				}
 			} else {
 				v = new Value();

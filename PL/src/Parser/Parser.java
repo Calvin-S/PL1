@@ -170,8 +170,9 @@ public class Parser{
 				e1 = new Var(temp, parseExpr(t));
 			}
 			else if (t.peek().getType().equals(TokenType.PERIOD)) {
+				consume(t, TokenType.PERIOD);
 				e1 = new Var(temp, null);
-				((Var) e1).isGlobal();
+				((Var) e1).setGlobal();
 			}
 			else {
 				e1 = new Var(temp, null);
