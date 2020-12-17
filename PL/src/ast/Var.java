@@ -4,11 +4,13 @@ public class Var extends Type{
 	private String name; 
 	private Expr e;
 	private boolean getValue; // if True then should find value of this variable
+	private boolean isGlobal;
 	
 	public Var(String name, Expr e) {
 		getValue = false;
 		this.name = name;
 		this.e = e;
+		isGlobal = false;
 	}
 	
 	@Override
@@ -48,7 +50,9 @@ public class Var extends Type{
 	public void setAsValue() {
 		getValue = true;
 	}
-	
+	public void setGlobal() {
+		isGlobal = true;
+	}
 	public boolean isValue() { return getValue; }
-
+	public boolean isGlobal() {return isGlobal; }
 }
