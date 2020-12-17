@@ -108,6 +108,7 @@ public class Parser{
 	    	consume(t, TokenType.IF);
 	    	consume(t, TokenType.LPAREN, "If statement guards need parenthesis");
 	    	Type g = parseBExpr(t);
+	    	consume(t, TokenType.RPAREN, "If statement guards need closing parenthesis");
 	    	consume(t, TokenType.LBRACE, "If statements bodies need brackets");
 	    	Seq body = parseSeqCond(t);
 	    	consume(t, TokenType.RBRACE, "If statement body needs a closing bracket");
