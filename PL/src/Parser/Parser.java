@@ -38,7 +38,6 @@ public class Parser{
 	
 	public static Program parseProg(Tokenizer t) throws SyntaxError {
 		Program p1 = new Program();
-		System.out.println(t.peek());
 		while (!t.peek().getType().equals(TokenType.EOF)) {
 			p1.addNode(parseFun(t));
 		}
@@ -179,7 +178,6 @@ public class Parser{
 				e1 = parseBExpr1(t, (Var) e1);
 			}
 		} else if (t.peek().getType().category().equals(TC.LIST)) {
-			System.out.println("hi");
 			e1 = parseListExpr(t);
 	    } else if (t.peek().getType().equals(TokenType.LBRACKET)){
 			e1 = parseList(t);
@@ -199,44 +197,57 @@ public class Parser{
 		return e1;
 	}
 	
+	// Since Get and Remove have similar syntax, this can be used
+	public static Expr parseListHelper(Tokenizer t, ListOperator op) throws SyntaxError {
+		consume(t, TokenType.LPAREN, "Expected right parenthesis for " + op);
+		Type l = parseList(t);
+		consume(t, TokenType.COMMA, "Expected comma in " + op + " syntax");
+		Expr e1 = new ListExpr(op, l, parseAExpr(t));
+		consume(t, TokenType.RPAREN, op + " method needs closing parenthesis");
+		return e1;
+	}
+	public static Expr parseListHelper1(Tokenizer t, ListOperator op, boolean isReplace) throws SyntaxError {
+		consume(t, TokenType.LPAREN, "Expected right parenthesis for " + op);
+		Type l = parseList(t);
+		consume(t, TokenType.COMMA, "Expected comma in insert syntax");
+		Expr toAddValue = parseExpr(t);
+		Expr index = null;
+		if (t.peek().getType().equals(TokenType.COMMA) || isReplace) {
+			consume(t, TokenType.COMMA, "Expected third argument in replace syntax");
+			index = parseAExpr(t);
+		}
+		Expr e1 = new ListExpr(op, l, index, toAddValue);
+		consume(t, TokenType.RPAREN, op + " method needs closing parenthesis");
+		return e1;
+	}
 	public static Expr parseListExpr(Tokenizer t) throws SyntaxError {
 		Expr e1 =  null;
-		System.out.println("hi");
 		if (t.peek().getType().equals(TokenType.GET)) {
 			consume(t, TokenType.GET);
-			consume(t, TokenType.LPAREN, "Expected right parenthesis for get");
-			List l = parseList(t);
-			consume(t, TokenType.COMMA, "Expected comma in get syntax");
-			e1 = new ListExpr(ListOperator.GET, l, parseExpr(t));
-			consume(t, TokenType.RPAREN, "List get method needs closing parenthesis");
-		} else if (t.peek().getType().equals(TokenType.INSERT)) {
-			
-			consume(t, TokenType.INSERT);
-			consume(t, TokenType.LPAREN, "Expected right parenthesis for insert");
-			List l = parseList(t);
-			consume(t, TokenType.COMMA, "Expected comma in insert syntax");
-			Expr toAddValue = parseExpr(t);
-			Expr index = null;
-			if (t.peek().getType().equals(TokenType.COMMA)) {
-				consume(t, TokenType.COMMA);
-				index = parseExpr(t);
-			}
-			e1 = new ListExpr(ListOperator.INSERT, l, index, toAddValue);
-			consume(t, TokenType.RPAREN, "List insert method needs closing parenthesis");
+			e1 = parseListHelper(t, ListOperator.GET);
 		} else if (t.peek().getType().equals(TokenType.REMOVE)) {
 			consume(t, TokenType.REMOVE);
-			consume(t, TokenType.LPAREN, "Expected right parenthesis for get");
-			List l = parseList(t);
-			consume(t, TokenType.COMMA, "Expected comma in remove syntax");
-			e1 = new ListExpr(ListOperator.GET, l, parseExpr(t));
-			consume(t, TokenType.RPAREN, "List remove method needs closing parenthesis");
+			e1 = parseListHelper(t, ListOperator.REMOVE);
+		} else if (t.peek().getType().equals(TokenType.INSERT)) {
+			consume(t, TokenType.INSERT);
+			e1 = parseListHelper1(t, ListOperator.INSERT, false);
+		} else if (t.peek().getType().equals(TokenType.REPLACE)) {
+			consume(t, TokenType.REPLACE);
+			e1 = parseListHelper1(t, ListOperator.REPLACE, true);
 		} else {
 			throw new SyntaxError("Parser implementation error: failed to catch all TC.LIST types");
 		}
 		return e1;
 	}
 	
-	public static List parseList(Tokenizer t) throws SyntaxError {
+	public static Type parseList(Tokenizer t) throws SyntaxError {
+		if (t.peek().getType().equals(TokenType.VAR)) {
+			consume(t, TokenType.VAR);
+			Var v = new Var(t.next().toVarToken().getValue(), null);
+			v.isValue();
+			return v;
+		}
+		
 		consume(t, TokenType.LBRACKET);
 		List l = new List();
 		while (!t.peek().getType().equals(TokenType.RBRACKET)) {
@@ -557,6 +568,6 @@ public class Parser{
 		if (t.peek().getType().equals(tt)) {
 			t.next();
 		} else
-			throw new SyntaxError(err);
+			throw new SyntaxError(err + " on line number " + t.lineNumber());
 	}
 }

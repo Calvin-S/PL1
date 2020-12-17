@@ -46,6 +46,7 @@ public enum TokenType {
     INSERT(TC.LIST, "insert"),
     REMOVE(TC.LIST, "remove"),
     GET(TC.LIST, "get"),
+    REPLACE(TC.LIST, "replace"),
     
     ASSIGN(TC.OTHER, "="),
     PERIOD(TC.OTHER, "."),

@@ -2,7 +2,7 @@ package ast;
 
 public class ListExpr extends Expr{
 	public enum ListOperator {
-		GET("get"), INSERT("");
+		GET("get"), INSERT("insert"), REMOVE("remove"), REPLACE("replace");
 
 		private final String stringRep;
 
@@ -16,20 +16,20 @@ public class ListExpr extends Expr{
     }
 	
 	private ListOperator operator;
-	private Expr list;
+	private Type list;
 	private Expr index;
 	private Expr value; // for when you insert something into list
 	
 	// For get and remove
-	public ListExpr(ListOperator o, Expr list, Expr index) {
+	public ListExpr(ListOperator o, Type list, Expr index) {
 		operator = o;
 		this.index = index;
 		this.list = list;
 		value = null;
 	}
 	
-	// For insertion to lists
-	public ListExpr(ListOperator o, Expr list, Expr index, Expr value) {
+	// For insertion and replace commands
+	public ListExpr(ListOperator o, Type list, Expr index, Expr value) {
 		operator = o;
 		this.index = index;
 		this.list = list;
@@ -56,6 +56,10 @@ public class ListExpr extends Expr{
 	public StringBuilder prettyPrint(StringBuilder sb) {
 		sb.append(operator.toString() + "(");
 		list.prettyPrint(sb);
+		if (value != null && (operator.equals(ListOperator.INSERT) || operator.equals(ListOperator.REPLACE))) {
+			sb.append(",");
+			value.prettyPrint(sb);
+		}
 		if (index != null) {
 			sb.append(", ");
 			index.prettyPrint(sb);

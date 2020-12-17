@@ -37,7 +37,7 @@ public class Tokenizer implements Iterator<Token> {
 	 * @param r The source from which the Tokenizer lexes input into Tokens
 	 */
 	public Tokenizer(Reader r) {
-		in = new LookAheadBuffer(4, new BufferedReader(r));
+		in = new LookAheadBuffer(5, new BufferedReader(r));
 		lineNumber = 1;
 	}
 
@@ -81,7 +81,6 @@ public class Tokenizer implements Iterator<Token> {
 			try {
 				lexOneToken();
 			} catch (IOException e) {
-				System.out.println("ih");
 				throw new TokenizerIOException(e);
 			}
 		}
@@ -194,7 +193,7 @@ public class Tokenizer implements Iterator<Token> {
 			consume('r', TokenType.OR);
 			break;
 		case 'r':
-			consume("emove", "Expected remove", TokenType.REMOVE);
+			lexR();
 			break;
 		case 'v':
 			lexVar(false);
@@ -313,6 +312,17 @@ public class Tokenizer implements Iterator<Token> {
 		tokens.add(new Token.StringToken(n, lineNumber));
 	}
 	
+	private void lexR() throws IOException {
+		if (in.peek() == 'e') {
+			in.next();
+		} else {
+			addErrorToken("Expected either remove or replace");
+		}
+		if (in.peek() == 'm')
+			consume("move", "Expected remove", TokenType.REMOVE);
+		else 
+			consume("place", "Expected replace", TokenType.REPLACE);
+	}
 	private void lexN() throws IOException {
 		if (in.peek() == 'o')
 			consume("ot", "Expected not", TokenType.NOT);

@@ -1,1 +1,6 @@
-"ADS"
+insert(["S","SD", if (T) {"D"}],3 - 2)
+remove([3,3,5,6],1)
+insert([3],"SD")
+insert([53,2,3],"SD",4)
+replace([43], "A", 1)
+replace([3],"D",1)
