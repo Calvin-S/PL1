@@ -30,6 +30,7 @@ public class Interpreter {
 	public Interpreter() {
 		store = new HashMap<String, Value>();
 		functions = new HashMap<String, Fun>();
+		params = new HashMap<String, Boolean>();
 	}
 
 //	public Interpreter(HashMap<String, Value> parameters) {
@@ -174,7 +175,7 @@ public class Interpreter {
 			
 			for(int i = 0; i<args.size(); i++) {
 				if (globalVars.containsKey(parameters.get(i).getName())) {
-					throw new EvaluationError("The function's parameters overlap with existing global varibles");
+					throw new EvaluationError("The function's parameters overlap with existing global variables");
 				}
 				passAlongParams.put(parameters.get(i).getName(), evaluateExpr(args.get(i)));
 
@@ -288,7 +289,7 @@ public class Interpreter {
 				v = new Value();
 				if (r.isGlobal()) {
 					if(params.containsKey(r.getName())) {
-						throw new EvaluationError("cannot declar global variable that overlaps with function parameters")
+						throw new EvaluationError("cannot declare global variable that overlaps with function parameters");
 					}
 					globalVars.put(r.getName(), v);
 				} else {
