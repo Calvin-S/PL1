@@ -475,13 +475,15 @@ public class Interpreter {
 
 		List<String> guards = r.getMatchTypes();
 		List<Expr> branches = r.getBranches();
+
 		String toMatch = r.getToMatch();
+		Value v = store.get(toMatch);
 
 		Node toExecute = null;
 
 		int i = 0;
 		while (i < guards.size()) {
-			if (toMatch.equals(guards.get(i))) {
+			if (v.getType().equals(guards.get(i))) {
 				toExecute = branches.get(i);
 				break;
 			} else {
