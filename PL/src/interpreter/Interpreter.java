@@ -251,6 +251,7 @@ public class Interpreter {
 					throw new EvaluationError("this variable has not been assigned a value");
 				}
 
+				return globalVars.get(r.getName());
 			} else {
 				printStore();
 				System.out.println(r.getName());
@@ -259,12 +260,22 @@ public class Interpreter {
 
 		} else {
 			Value v;
+
 			if (r.getChild() != null) {
 				v = evaluateExpr(r.getChild());
-				store.put(r.getName(), v);
+
+				if (r.isGlobal()) {
+					globalVars.put(r.getName(), v);
+				} else {
+					store.put(r.getName(), v);
+				}
 			} else {
 				v = new Value();
-				store.put(r.getName(), v);
+				if (r.isGlobal()) {
+					globalVars.put(r.getName(), v);
+				} else {
+					store.put(r.getName(), v);
+				}
 			}
 			return v;
 		}
