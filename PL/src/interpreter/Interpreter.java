@@ -25,27 +25,32 @@ public class Interpreter {
 
 	private HashMap<String, Value> store = null;
 	private HashMap<String, Fun> functions = null;
+	private HashMap<String, Boolean> params = null;
 
 	public Interpreter() {
 		store = new HashMap<String, Value>();
 		functions = new HashMap<String, Fun>();
 	}
 
-	public Interpreter(HashMap<String, Value> parameters) {
-		store = new HashMap<String, Value>();
-		functions = new HashMap<String, Fun>();
-		for (String key : parameters.keySet()) {
-			store.put(key, parameters.get(key));
-		}
-	}
+//	public Interpreter(HashMap<String, Value> parameters) {
+//		store = new HashMap<String, Value>();
+//		functions = new HashMap<String, Fun>();
+//		for (String key : parameters.keySet()) {
+//			store.put(key, parameters.get(key));
+//		}
+//	}
 	
 	public Interpreter(HashMap<String, Value> parameters, Fun fun) {
 		store = new HashMap<String, Value>();
 		functions = new HashMap<String, Fun>();
+		params = new HashMap<String, Boolean>();
+
 		for (String key : parameters.keySet()) {
 			store.put(key, parameters.get(key));
+			params.put(key, false);
 		}
 		functions.put(fun.getName(), fun);
+
 	}
 
 	public Value evaluateProg(Program p) throws EvaluationError {
@@ -163,10 +168,14 @@ public class Interpreter {
 			if(args.size() != parameters.size()) {
 				throw new EvaluationError("The number of arguments you gave does not match how many the function needs.");
 			}
+
 			
 			HashMap<String, Value> passAlongParams = new HashMap<String, Value>();
 			
 			for(int i = 0; i<args.size(); i++) {
+				if (globalVars.containsKey(parameters.get(i).getName())) {
+					throw new EvaluationError("The function's parameters overlap with existing global varibles");
+				}
 				passAlongParams.put(parameters.get(i).getName(), evaluateExpr(args.get(i)));
 
 			}
@@ -278,6 +287,9 @@ public class Interpreter {
 			} else {
 				v = new Value();
 				if (r.isGlobal()) {
+					if(params.containsKey(r.getName())) {
+						throw new EvaluationError("cannot declar global variable that overlaps with function parameters")
+					}
 					globalVars.put(r.getName(), v);
 				} else {
 					store.put(r.getName(), v);

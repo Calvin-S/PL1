@@ -2,7 +2,7 @@ package interpreter;
 
 public class Value {
 
-	private int[] type = { 0, 0, 0, 0 };
+	private int[] type = { 0, 0, 0, 0, 0 };
 
 	private long intVal;
 	private String stringVal;
