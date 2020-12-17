@@ -2,6 +2,8 @@ package interpreter;
 
 import java.util.ArrayList;
 
+import ast.Expr;
+
 public class Value {
 
 	// int, string, bool, null, list
@@ -11,7 +13,9 @@ public class Value {
 	private String stringVal;
 	private boolean boolVal;
 	private boolean nullVal;
-	private ArrayList<Value> listVal;
+	private ArrayList<Expr> listVal;
+
+	private Interpreter interpreter;
 
 	public Value(long i) {
 		intVal = i;
@@ -54,13 +58,15 @@ public class Value {
 		type[3] = 1;
 	}
 
-	public Value(ArrayList<Value> v) {
+	public Value(ArrayList<Expr> v, Interpreter i) {
 		intVal = 0;
 		stringVal = "";
 		boolVal = false;
 		nullVal = false;
 
 		listVal = v;
+
+		interpreter = i;
 
 		type[4] = 1;
 	}
@@ -101,7 +107,7 @@ public class Value {
 		return nullVal;
 	}
 
-	public ArrayList<Value> getList() {
+	public ArrayList<Expr> getList() {
 		return listVal;
 	}
 
@@ -115,15 +121,14 @@ public class Value {
 		} else if (type[0] == 0 && type[1] == 0 && type[2] == 0 && type[3] == 1 && type[4] == 0) {
 			return "NULL";
 		} else if (type[0] == 0 && type[1] == 0 && type[2] == 0 && type[3] == 0 && type[4] == 1) {
-			StringBuilder sb = new StringBuilder("[");
-			for (Value v : listVal) {
-				sb.append(v.toString() + ", ");
+			String s = "";
+			try {
+				s = interpreter.listToString(listVal);
+			} catch (EvaluationError e) {
+				System.out.println("something went wrong when trying to print list");
 			}
-			String listTemp = sb.toString();
-			listTemp = listTemp.substring(0, listTemp.length() - 2);
 
-			listTemp = listTemp + "]";
-			return listTemp;
+			return s;
 
 		} else {
 			return "something went wrong with value";
