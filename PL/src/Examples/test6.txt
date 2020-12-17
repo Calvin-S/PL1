@@ -1,5 +1,5 @@
 fun fibb ($a)
  {if ($a < 1) {0} elif ($a <= 2) {1} 
  else { @fibb($a - 1) + @fibb($a - 2)}}
- // 1 1 2 3 5 8 13 ... 233!
-@fibb(13)
+$a = 13
+@fibb($a)

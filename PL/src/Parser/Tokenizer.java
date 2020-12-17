@@ -181,14 +181,20 @@ public class Tokenizer implements Iterator<Token> {
 		case 'f':
 			lexf();
 			break;
+		case 'g':
+			consume("et", "Expected get", TokenType.GET);
+			break;
 		case 'i':
-			consume('f', TokenType.IF);
+			lexI();
 			break;
 		case 'n':
 			lexN();
 			break;
 		case 'o':
 			consume('r', TokenType.OR);
+			break;
+		case 'r':
+			consume("emove", "Expected remove", TokenType.REMOVE);
 			break;
 		case 'v':
 			lexVar(false);
@@ -198,6 +204,9 @@ public class Tokenizer implements Iterator<Token> {
 			break;
 		case '$':
 			lexVar(true);
+			break;
+		case '.':
+			addToken(TokenType.PERIOD);
 			break;
 		case '@':
 			lexCall();
@@ -305,8 +314,6 @@ public class Tokenizer implements Iterator<Token> {
 	}
 	
 	private void lexN() throws IOException {
-//		consume("ot", "Expected not", TokenType.NOT);
-		
 		if (in.peek() == 'o')
 			consume("ot", "Expected not", TokenType.NOT);
 		else {
@@ -346,6 +353,14 @@ public class Tokenizer implements Iterator<Token> {
 			addToken(TokenType.LTE);
 		} else {
 			addToken(TokenType.LT);
+		}
+	}
+	
+	private void lexI() throws IOException {
+		if (in.peek() == 'f')
+			consume('f', TokenType.IF);
+		else {
+			consume("nsert", "Expected Insert", TokenType.INSERT);
 		}
 	}
 	

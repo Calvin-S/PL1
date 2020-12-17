@@ -1,5 +1,6 @@
-fun goba ($a, $b, $c) {$a if ($a) {@goba(F,T,T)}}
-$a = 3 + 2
+fun goba ($a, $b, $c) {$a = 2+3}
+$a = T
 $e = @goba(F,4+3, $a)
 $d = "ASD"
-@goba(T, "F", "17")
+@goba($a, "F", "17")
+$a

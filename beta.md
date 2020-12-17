@@ -10,14 +10,6 @@ We attempting to implement a fully working language based off of our own designs
 ### Grammar Rules
 It should be noted that the grammar is not accurate when it comes to var, as the interpeter will type check valid operations. E.g. a variable could be 3, and a BExpr such as 3 or T makes no sense. It should be noted that the syntax roughly follows this grammar tree. 
 
-Types
-```
-| Var (var)
-| Int (int)
-| String (str)
-| Bool (b)
-| Null
-```
 Seq
 ```
 | Expr
@@ -28,10 +20,15 @@ Expr
 | if (BExpr) {Seq} 
 | if (BExpr) {Seq} Elif
 | while (BExpr) {Seq}
+| $[var_name];
 | $[var_name]
+| var [var_name];
 | var [var_name]
 | $[var_name] = Expr
 | var [var_name] = Expr
+| BExpr
+| Aexpr
+| "
 ```
 Elif
 ```
@@ -42,7 +39,6 @@ BExpr
 ```
 | T
 | F
-| AExpr
 | $[var_name]
 | var [var_name]
 | not BExpr
@@ -64,8 +60,8 @@ AExpr
 | AExpr - AExpr
 ```
 
-### Expression as functions
-Because every expression acts like a function (aka returns some value), we can even assign expressions to variables. So we will first cover variable syntax:
+### All Language Constructs are Expressions
+Because every expression returns some value, we can assign expressions to variables. So we will first cover variable syntax:
 Variable declaration (both expressions achieve the same effect)
 ```
 $[var_name];

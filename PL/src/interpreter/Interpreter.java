@@ -47,6 +47,10 @@ public class Interpreter {
 	}
 
 	public Value evaluateProg(Program p) throws EvaluationError {
+		if (p == null) {
+			return new Value();
+		}
+		
 		List<Node> funs = p.getChildren();
 
 		Fun main = (Fun) funs.get(funs.size() - 1);
@@ -289,7 +293,6 @@ public class Interpreter {
 	}
 
 	public Value evaluateStrExpr(StrExpr b) throws EvaluationError {
-
 		if (b.getOperator().equals("~")) {
 
 			Value v = evaluateExpr(b.getChildren().get(1));

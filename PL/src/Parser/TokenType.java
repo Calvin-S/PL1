@@ -23,7 +23,7 @@ public enum TokenType {
 	NOT(TC.BOP, "not"),
 	
 	REVERSE(TC.STRING, "rev"),
-	CONCAT(TC.STRING, "+"),
+	CONCAT(TC.STRING, "^"),
 	
 	STRING(TC.VALUES, "<str>"),
 	NUM(TC.VALUES, "<number>"),
@@ -41,11 +41,16 @@ public enum TokenType {
     FUN(TC.FUNC, "fun"),
     CALL(TC.FUNC, "call"),
     
+    LBRACKET(TC.OTHER, "["),
+    RBRACKET(TC.OTHER, "]"),
+    INSERT(TC.LIST, "insert"),
+    REMOVE(TC.LIST, "remove"),
+    GET(TC.LIST, "get"),
+    
     ASSIGN(TC.OTHER, "="),
+    PERIOD(TC.OTHER, "."),
 	SEMICOLON(TC.OTHER, ";"),
 	COMMA(TC.OTHER, ","),
-	LBRACKET(TC.OTHER, "["),
-    RBRACKET(TC.OTHER, "]"),
     LPAREN(TC.OTHER, "("),
     RPAREN(TC.OTHER, ")"),
     LBRACE(TC.OTHER, "{"),
