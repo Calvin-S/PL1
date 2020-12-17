@@ -122,6 +122,7 @@ public class Tokenizer implements Iterator<Token> {
 			break;
 		case ':':
 			addToken(TokenType.COLON);
+			break;
 		case '[':
 			addToken(TokenType.LBRACKET);
 			break;
@@ -290,7 +291,7 @@ public class Tokenizer implements Iterator<Token> {
 		if (!usingDollar)
 			consume("ar ", "Expected 'var [name]'");
 		String n = "";
-		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != '.' && in.peek() != ')' && in.peek() != '}' && in.peek() != ',') {
+		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != '.' && in.peek() != ')' && in.peek() != ':' && in.peek() != '}' && in.peek() != ',') {
 			n += Character.toString(in.next());
 		}
 		tokens.add(new Token.VarToken(n, lineNumber));

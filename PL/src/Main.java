@@ -14,7 +14,7 @@ import interpreter.Value;
 public class Main {
 	public static void main(String args[]) {
 		
-		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test8.txt");
+		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test9.txt");
 		Reader r = new BufferedReader(new InputStreamReader(in));
 
 		Parser parser = new Parser();
@@ -31,17 +31,17 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		System.out.println("\nSTORE VALUES:");
-
-		HashMap<String, Value> store = i.getStore();
-		
-		if (store != null) {
-			for (String key : store.keySet()) {
-				System.out.println(key + " : " + store.get(key));
-			}
-		} else {
-			System.out.println("store was never initialized");
-		}
+		//System.out.println("\nSTORE VALUES:");
+		i.printStore();
+//		HashMap<String, Value> store = i.getStore();
+//		
+//		if (store != null) {
+//			for (String key : store.keySet()) {
+//				System.out.println(key + " : " + store.get(key));
+//			}
+//		} else {
+//			System.out.println("store was never initialized");
+//		}
 
 	}
 }

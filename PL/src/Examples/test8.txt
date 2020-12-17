@@ -1,3 +1,14 @@
-$a = 2
+fun ha ($c) {$b = 5}
+$b.
+$a = 0
 $b = [10,$a,5]
-get($b,1)
+get($b, $a + 2)
+remove($b, 1)
+insert($b, $a + 2)
+insert($b, 20, 0)
+insert($b, 20, 3)
+replace($b, 11, 2)
+$d = "hi"
+$c = ""
+replace($b, while ($a < 3) {$a = $a + 1 $c = $c ^ $d}, 3)
+get($b, 3)

@@ -108,7 +108,6 @@ public class Parser{
 	    	consume(t, TokenType.IF);
 	    	consume(t, TokenType.LPAREN, "If statement guards need parenthesis");
 	    	Type g = parseBExpr(t);
-	    	consume(t, TokenType.RPAREN, "If guard missing closing parenthesis");
 	    	consume(t, TokenType.LBRACE, "If statements bodies need brackets");
 	    	Seq body = parseSeqCond(t);
 	    	consume(t, TokenType.RBRACE, "If statement body needs a closing bracket");
@@ -188,7 +187,10 @@ public class Parser{
 			else {
 				e1 = new Var(temp, null);
 				((Var) e1).setAsValue();
-				e1 = parseBExpr1(t, (Var) e1);
+				if (t.peek().getType().equals(TokenType.CONCAT))
+		        	e1 = parseStrExpr1(t, (Type)e1);
+		        else if (!t.peek().getType().equals(TokenType.NOT) && (t.peek().getType().category().equals(TC.BINOP) || t.peek().getType().category().equals(TC.BOP)))
+		        	e1 = parseBExpr1(t, (Type)e1);
 			}
 		} else if (t.peek().getType().category().equals(TC.LIST)) {
 			e1 = parseListExpr(t);
@@ -204,7 +206,7 @@ public class Parser{
 	    	consume(t, TokenType.NULL);
 	    	e1 = new Null();
 	    } else{
-	    	System.out.println("Parse error on char \'" + t.peek() + "\'");
+	    	System.out.println("Parse error on token \'" + t.peek() + "\'");
 	    	throw new SyntaxError("Parsing Expression failed on line " + t.lineNumber());
 		};
 		return e1;
@@ -255,9 +257,8 @@ public class Parser{
 	
 	public static Type parseList(Tokenizer t) throws SyntaxError {
 		if (t.peek().getType().equals(TokenType.VAR)) {
-			consume(t, TokenType.VAR);
 			Var v = new Var(t.next().toVarToken().getValue(), null);
-			v.isValue();
+			v.setAsValue();
 			return v;
 		}
 		
@@ -286,6 +287,9 @@ public class Parser{
 			s1 = new StrExpr(parseStrExpr(t));
 		} else if (t.peek().isString()) {
 			s1 = new Str(t.next().toStringToken().getValue());
+		} else if (t.peek().getType().equals(TokenType.VAR)) {
+			s1 = new Var(t.next().toVarToken().getValue(), null);
+			((Var) s1).setAsValue();
 		} else {
 			throw new SyntaxError("Assigning String failed on line " + t.lineNumber());
 		}

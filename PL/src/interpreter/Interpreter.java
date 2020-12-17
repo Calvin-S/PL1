@@ -62,7 +62,8 @@ public class Interpreter {
 			sb.append(evaluateExpr(v).toString() + ", ");
 		}
 		String listTemp = sb.toString();
-		listTemp = listTemp.substring(0, listTemp.length() - 2);
+		if (turnToString.size() > 0)
+			listTemp = listTemp.substring(0, listTemp.length() - 2);
 
 		listTemp = listTemp + "]";
 		return listTemp;
@@ -400,7 +401,6 @@ public class Interpreter {
 
 				return globalVars.get(r.getName());
 			} else {
-				printStore();
 				System.out.println(r.getName());
 				throw new EvaluationError("this variable does not exist");
 			}
@@ -410,11 +410,16 @@ public class Interpreter {
 
 			if (r.getChild() != null) {
 				v = evaluateExpr(r.getChild());
-
-				if (r.isGlobal()) {
+				if (store.containsKey(r.getName())) {
+					store.put(r.getName(), v);
+				} else if (globalVars.containsKey(r.getName())){
 					globalVars.put(r.getName(), v);
 				} else {
-					store.put(r.getName(), v);
+					if (r.isGlobal()) {
+						globalVars.put(r.getName(), v);
+					} else {
+						store.put(r.getName(), v);
+					}
 				}
 
 			} else {
@@ -477,7 +482,7 @@ public class Interpreter {
 		} else if (b.getOperator().equals("^")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
 			Value v2 = evaluateExpr(b.getChildren().get(1));
-
+			System.out.println(((Var)b.getChildren().get(1)).isValue());
 			if (v1.getType().equals("string") && v2.getType().equals("string")) {
 				return new Value(v1.getString() + v2.getString());
 			} else if (v1.getType().equals("string") && v2.getType().equals("int")) {
