@@ -21,6 +21,8 @@ import ast.While;
 
 public class Interpreter {
 
+	static HashMap<String, Value> globalVars = new HashMap<String, Value>();
+
 	private HashMap<String, Value> store = null;
 	private HashMap<String, Fun> functions = null;
 
@@ -239,10 +241,16 @@ public class Interpreter {
 			if (store.containsKey(r.getName())) {
 				Value v = store.get(r.getName());
 				if (v == null) {
-					throw new EvaluationError("this variable does not have a value");
+					throw new EvaluationError("this variable has not been assigned a value");
 				}
 
 				return store.get(r.getName());
+			} else if (globalVars.containsKey(r.getName())) {
+				Value v = globalVars.get(r.getName());
+				if (v == null) {
+					throw new EvaluationError("this variable has not been assigned a value");
+				}
+
 			} else {
 				printStore();
 				System.out.println(r.getName());
@@ -254,8 +262,7 @@ public class Interpreter {
 			if (r.getChild() != null) {
 				v = evaluateExpr(r.getChild());
 				store.put(r.getName(), v);
-			}
-			else {
+			} else {
 				v = new Value();
 				store.put(r.getName(), v);
 			}
