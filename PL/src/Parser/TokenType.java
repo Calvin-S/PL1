@@ -32,11 +32,17 @@ public enum TokenType {
     VAR(TC.VALUES, "<var>"),
     NULL(TC.VALUES, "null"),
     
+    INT(TC.TYPES, "int"),
+    STR(TC.TYPES, "str"),
+    BOOL(TC.TYPES, "bool"),
+    LIST(TC.TYPES, "list"),
+    
     IF(TC.COND, "if"),
     ELIF(TC.COND, "elif"),
     ELSE(TC.COND, "else"),
     FOR(TC.COND, "for"),
     WHILE(TC.COND, "while"),
+    MATCH(TC.COND, "match"),
     
     FUN(TC.FUNC, "fun"),
     CALL(TC.FUNC, "call"),
@@ -51,6 +57,7 @@ public enum TokenType {
     ASSIGN(TC.OTHER, "="),
     PERIOD(TC.OTHER, "."),
 	SEMICOLON(TC.OTHER, ";"),
+	COLON(TC.OTHER, ":"),
 	COMMA(TC.OTHER, ","),
     LPAREN(TC.OTHER, "("),
     RPAREN(TC.OTHER, ")"),

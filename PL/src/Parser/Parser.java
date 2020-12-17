@@ -132,6 +132,17 @@ public class Parser{
 		    	consume(t, TokenType.RBRACE, "Else statement bodies needs a closing bracket");
 	    		((If) e1).addBranch(new Bool(true), elseBody);
 	    	}
+		} else if (t.peek().getType().equals(TokenType.MATCH)) {
+			consume(t,  TokenType.MATCH);
+			if (!t.peek().getType().equals(TokenType.VAR))
+				throw new SyntaxError("A variable should be followed after keyword match");
+			e1 = new Match(t.next().toVarToken().getValue());
+			consume(t, TokenType.COLON, "Expected colon after Matching a variable");
+			while (t.peek().getType().category().equals(TC.TYPES)) {
+				String type = t.next().getType().toString();
+				consume(t, TokenType.COLON, "Expected colon after Matching with a type");
+				((Match) e1).addBranch(type, parseExpr(t));
+			}
 		} else if (t.peek().getType().equals(TokenType.CALL)) {
 			String f = t.next().toCallToken().getValue();
 			e1 = new Call(f);

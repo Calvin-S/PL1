@@ -120,6 +120,8 @@ public class Tokenizer implements Iterator<Token> {
 		case ';':
 			addToken(TokenType.SEMICOLON);
 			break;
+		case ':':
+			addToken(TokenType.COLON);
 		case '[':
 			addToken(TokenType.LBRACKET);
 			break;
@@ -174,6 +176,9 @@ public class Tokenizer implements Iterator<Token> {
 		case 'a':
 			consume("nd", "Expected and", TokenType.AND);
 			break;
+		case 'b':
+			consume("ool", "Expected bool", TokenType.BOOL);
+			break;
 		case 'e':
 			lexE();
 			break;
@@ -186,6 +191,12 @@ public class Tokenizer implements Iterator<Token> {
 		case 'i':
 			lexI();
 			break;
+		case 'l':
+			consume("ist", "Expected list", TokenType.LIST);
+			break;
+		case 'm':
+			consume("atch", "Expected match", TokenType.MATCH);
+			break;
 		case 'n':
 			lexN();
 			break;
@@ -194,6 +205,9 @@ public class Tokenizer implements Iterator<Token> {
 			break;
 		case 'r':
 			lexR();
+			break;
+		case 's':
+			consume("tr", "Expected str", TokenType.STR);
 			break;
 		case 'v':
 			lexVar(false);
@@ -370,7 +384,12 @@ public class Tokenizer implements Iterator<Token> {
 		if (in.peek() == 'f')
 			consume('f', TokenType.IF);
 		else {
-			consume("nsert", "Expected Insert", TokenType.INSERT);
+			if (in.peek() == 'n')
+				in.next();
+			if (in.peek() == 't')
+				consume('t', TokenType.INT);
+			else 
+				consume("sert", "Expected Insert", TokenType.INSERT);
 		}
 	}
 	

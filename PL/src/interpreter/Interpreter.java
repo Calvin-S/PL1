@@ -126,7 +126,7 @@ public class Interpreter {
 
 			Bool r = (Bool) n;
 			return new Value(r.getBool());
-		} else if (n instanceof List) {
+		} else if (n instanceof ast.List) {
 
 			ast.List r = (ast.List) n;
 			ArrayList<Expr> items = r.getValues();
