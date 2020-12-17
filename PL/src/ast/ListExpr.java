@@ -48,6 +48,10 @@ public class ListExpr extends Expr{
 		return index;
 	}
 	
+	public Expr getToInsert() {
+		return value;
+	}
+
 	public String toString() {
 		return prettyPrint(new StringBuilder()).toString();
 	}
