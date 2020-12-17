@@ -21,6 +21,10 @@ public class Match extends Expr{
 		return types;
 	}
 	
+	public String getToMatch() {
+		return toMatchVar;
+	}
+
 	public ArrayList<Expr> getBranches() {
 		return branches;
 	}

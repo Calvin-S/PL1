@@ -11,6 +11,7 @@ import ast.Expr;
 import ast.Fun;
 import ast.If;
 import ast.ListExpr;
+import ast.Match;
 import ast.Node;
 import ast.Null;
 import ast.Number;
@@ -169,6 +170,10 @@ public class Interpreter {
 
 			If r = (If) n;
 			return evaluateIf(r);
+
+		} else if (n instanceof Match) {
+			Match r = (Match) n;
+			return evaluateMatch(r);
 
 		} else if (n instanceof Var) {
 
@@ -456,6 +461,31 @@ public class Interpreter {
 				} else {
 					i++;
 				}
+			}
+		}
+
+		if (toExecute == null) {
+			return new Value();
+		}
+
+		return evaluateExpr(toExecute);
+	}
+
+	public Value evaluateMatch(Match r) throws EvaluationError {
+
+		List<String> guards = r.getMatchTypes();
+		List<Expr> branches = r.getBranches();
+		String toMatch = r.getToMatch();
+
+		Node toExecute = null;
+
+		int i = 0;
+		while (i < guards.size()) {
+			if (toMatch.equals(guards.get(i))) {
+				toExecute = branches.get(i);
+				break;
+			} else {
+				i++;
 			}
 		}
 
