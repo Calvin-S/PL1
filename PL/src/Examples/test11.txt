@@ -1,4 +1,8 @@
-fun add($x) {$x. $x = $x + $b}
-$x = 0
-@add(3)
-$x
+$x = [0,1,2]
+match $x :
+int : $x + 1
+string : $x ^ $x
+list : insert($x,3)
+bool : if ($x) {not $x}
+null : "null"
+size($x)

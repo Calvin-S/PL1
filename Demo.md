@@ -39,7 +39,7 @@ This program evaluates to:
 
 ## 
 # Syntax
- Note the parenthesis is merely a substitute for the actual AST representation. It should also be noted that parser parses binary operators right associatively if order precedences are the same. Boolean operators have no order precedence. Basic arithmetic and boolean expression along with common errors during parsing and then evaluation shown below.
+ Note the parenthesis is merely a substitute for the actual AST representation. It should also be noted that parser parses binary operators right associatively if order precedences are the same. Boolean operators have no order precedence. Since we wrote the parser from scratch, we can give syntax-specific errors to the user.
 ```
 not T or F --> not (true or false) --> false
 ```
@@ -52,14 +52,8 @@ T and (1 + 3) == 3 --> true and ((1 + 3) == 3) --> false
 ```
 2 * 2 * 2 + 2 * 2 * 2 --> ((2 * (2 * 2)) + (2 * (2 * 2)) --> 16
 ```
-```
-3 + T --> Parser.SyntaxError: Assigning Arithmetic Values failed on line 1
-```
-```
-F or T) --> Parser.SyntaxError: Parenthesis Mismatch
-```
 
-A final note should be made that the syntax follows a rigid grammar, and thus separators for expressions can simply be whitespace or semicolon. For example all the below lines parse equivalently:
+A final note should be made that the syntax follows a rigid grammar, and thus separators for expressions can simply be whitespace or semicolon. For example all the lines below parse equivalently:
 ```
 $a = 1 $b = 2
 ```
@@ -70,13 +64,115 @@ $a=1;$b=2;
 $a=1
 $b=2
 ```
+## Basic Expressions on Types:
+--> denotes evaluation by our parser
+### Booleans
+```
+T --> true
+F --> false
+T or F --> true
+T and F --> false
+not F or F --> false
+(not F) or F --> true
+T and (not F) --> true
+```
+Common Errors:
+```
+T or --> Parser.SyntaxError: Assigning Boolean Values failed on line 1
+
+T or 3 --> Failed assigning booleans on logical operators (perhaps add parenthesis) on line 1
+```
+### Integers
+Our parsing for integers only goes to a maximum of 64 bit signed integer. Also, negative numbers and the minus sign differ by a space, so "-4" is negative four, while "- 4" is minus four.
+```
+3023 --> 3023
+-892 --> -892
+3 + -2 --> 1
+3 - 2 --> 1
+2 + 1 * 4 + 2 --> 8
+(7 - 0) / 2 --> 3
+
+```
+
+Common Errors:
+```
+9223372036854775808 --> Syntax error at line 1: Number expected or exceeded 64 bit signed integer, got 9223372036854775808
+
+(7 -0) --> Syntax error on consuming <number> Expected RPAREN
+```
+### Strings
+There are no escape characters in our language. The parser simply parses from the first quotation mark to the next. So a newline has to be written as a literal newline, and there is no way to write a quotation mark in our language. Note that quotation marks are omitted when printing in evaluation
+```
+"hi" --> hi
+"hello" ^ " " ^ "world" --> hello world
+~ "0114" ^ "SC" --> CS4110
+(~ "0114") ^ "SC" --> SC4110
+
+// This evaluates to an integer, not a string
+len("a" ^ "b") --> 2
+```
+
+Common Errors:
+```
+"oh"h --> Syntax error at line 1: Unrecognized character h
+
+"a" ^ "b" ^ 3 --> Parser.SyntaxError: Assigning String failed on line 1
+
+len("a b" --> Parser.SyntaxError: len method needs closing parenthesis on line number 1
+```
+### Lists
+Lists are dynamically typed, so we can put anything inside, although expressions will be evaluated to a value. There are five main built-in functions on lists on top of declaration.
+```
+[1, "2", T, [F, F]] --> [1, "2", T, [F, F]]
+[while(F){"oh no"}, if(T) {"hi"}] --> [NULL, hi]
+
+insert(["C", "W"], "O") --> [C, O, W]
+insert([3, 2], "hi", 1) --> [3, hi, 2]
+
+remove([3, 3, 5, 6], 0) --> [3, 5, 6]
+remove(["CS", "is", "not", "fun"], 2) --> [CS, is, fun]
+
+replace([1, 2, 3, 4], 0, 1) --> [1, 0, 3, 4]
+replace([0, "no"], if(T) {"yay"}, 1) --> [0, yay]
+
+```
+Common Errors:
+```
+["ad",,] --> Parser.SyntaxError: Parse error on token ','
+
+insert([0,1,2],"3" , 4) --> interpreter.EvaluationError: index out of bounds
+
+remove([1,2,3], 4) --> interpreter.EvaluationError: index out of bounds
+
+replace([43], "A", -1) --> interpreter.EvaluationError: index out of bounds
+```
+#### List Equality
+```
+$x = [1,"AS",[1,2],T]
+$y = [1,"AS",[1,2],T]
+$z = ["no","yes",[1,2],F]
+$a = $x == $y
+$x != $z
+```
+The Store evaluates to
+```
+a : true
+x : [1, AS, [1, 2], true]
+y : [1, AS, [1, 2], true]
+z : [1, AS, [1, 2], false]
+```
+The Program evaluates to
+
+    true
 ## Variable Assignment:
 ```
 $a = T
 $b = if ($a) {3}
 var c = "ASDF"
 var d = 3 + 2
-$e = $f = 0
+$e = null
+$f = $g = 0
+
 ```
 The Store evaluates to
 ```
@@ -84,8 +180,9 @@ a : true
 b : 3
 c : ASDF
 d : 5
-e : 0
+e : NULL
 f : 0
+g : 0
 ```
 The Program evaluates to
 
@@ -257,46 +354,70 @@ Throws the same error:
 interpreter.EvaluationError: The function's parameters overlap with existing global variables
 ```
 
-## Example 5: 
-Programs with multiple expressions will evaluate to the last expression:
+## Type Matching: 
+### Example 1
 ```
-$a = $b = $d = 2
-$c;
-while ($a < 10) {
-$b = 0 - $a 
-$a = $a + 1}
-$c
+$x = [0,1,2]
+match $x : 
+int : $x + 1
+string : $x ^ $x
+list : insert($x,3)
+bool : if ($x) {not $x}
+null : "null"
+size($x)
 ```
 The Store evaluates to: 
 ```
-a : 10
-b : -9
-c : NULL
-d : 2
+x : [0, 1, 2, 3]
 ```
 The Program evaluates to:
 
-    null
+    4
+### Example 2
+We don't necessarily need to match to every type, so the example below is valid:
+```
+$x = "no"
+match $x : 
+int : $x + 1
+string : $x ^ (~$x)
+```
+The Store evaluates to: 
+```
+x : no
+```
+The Program evaluates to:
 
-## Error (Types Mismatch):
-Since our variables are dynamically typed, there are type errors when interpeting types that don't match:
-```
-$a = T
-3 + $a
-```
-Throws the error
+    noon
 
-    trying to add one or more things that are not ints
-Similarly,
+### Example 3
+If a type is not matched, then it will simply return null.
 ```
-$a = T
-$c = 2
-$d = $b = $c
-$e = $a and $d
+$x = "no"
+match $x : 
+int : $x + 1
+bool : if ($x) {not $x}
+null : 1
 ```
-Throws the error
-    trying to and one or more things that are not bools
-## Error (Syntax on If/While):
+The Store evaluates to: 
+```
+x : no
+```
+The Program evaluates to:
+
+    NULL
+### Example 4
+Since only variables are dynamically typed, it only makes sense that match can only be performed on variables.
+```
+$x = 1
+match 3 : 
+int : $x + 1
+```
+Throws the error:
+```
+Parser.SyntaxError: A variable should be followed after keyword match
+```
+## Other Errors (Syntax on If/While):
+The below demonstrates our user-friendly parser, which can explicitly tell users where something has gone wrong.
 If statements all need parenthesis for the guard and brackets for the body:
 ```
 $a = 30
@@ -304,31 +425,28 @@ if (T) {$a
 ```
 Throws the error
 
-    If statement body needs a closing bracket
+    Parser.SyntaxError: If statement body needs a closing bracket on line number 2
 and the program
 ```
 if (T or F {"hi"}
 ```
 Throws the error
 
-    If guard missing closing parenthesis
+    Parser.SyntaxError: If statement guards need closing parenthesis on line number 1
 Similarly for while loops:
 ```
 $a = 30
-while ($a < 0) {$a = $a - 1
+while ($a < 0) 
+{$a = $a - 1
 ```
 Throws the error
 
-    While statement body needs closing brackets
+    Parser.SyntaxError: While statement body needs a closing bracket on line number 3
 and
 ```
 $a = 30
-while (F {$a}
+while F) {$a}
 ```
 Throws the error
 
-    While statement guard needs closing parenthesis
-
-
-# Next Steps
-Our language is still missing out a few major features such as being able to call functions possibly with parameters to pass in, so that will probably be our next main goal. Some other small things we have not implemented is string manipulation operators such as concatenation or substrings. After those two extensions, we will try to attempt more complicated topics such as polymorphism or perhaps higher ordered functions, although specifics will have to depend on how functions are implemented.
+    Parser.SyntaxError: While statement guard needs parenthesis on line number 2

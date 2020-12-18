@@ -19,7 +19,9 @@ public class Main {
 
 		Parser parser = new Parser();
 		Program prog = parser.parse(r);
-		System.out.println(prog);
+		
+		// Uncomment the line below for AST pretty print
+		//System.out.println(prog);
 
 		Interpreter i = new Interpreter();
 		Value v;
@@ -30,18 +32,6 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		//System.out.println("\nSTORE VALUES:");
-		i.printStore();
-//		HashMap<String, Value> store = i.getStore();
-//		
-//		if (store != null) {
-//			for (String key : store.keySet()) {
-//				System.out.println(key + " : " + store.get(key));
-//			}
-//		} else {
-//			System.out.println("store was never initialized");
-//		}
 
 	}
 }

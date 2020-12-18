@@ -138,8 +138,14 @@ public class Parser{
 				throw new SyntaxError("A variable should be followed after keyword match");
 			e1 = new Match(t.next().toVarToken().getValue());
 			consume(t, TokenType.COLON, "Expected colon after Matching a variable");
-			while (t.peek().getType().category().equals(TC.TYPES)) {
-				String type = t.next().getType().toString();
+			while (t.peek().getType().category().equals(TC.TYPES) || t.peek().getType().equals(TokenType.NULL)) {
+				String type;
+				if (t.peek().getType().equals(TokenType.NULL)) {
+					type = "null";	
+					consume(t, TokenType.NULL);
+				} else {
+					type = t.next().getType().toString();
+				}
 				consume(t, TokenType.COLON, "Expected colon after Matching with a type");
 				((Match) e1).addBranch(type, parseExpr(t));
 			}

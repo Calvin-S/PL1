@@ -461,7 +461,7 @@ public class Tokenizer implements Iterator<Token> {
 			tokens.add(new Token.NumToken(val, lineNumber));
 			
 		} catch (NumberFormatException e) {
-			addErrorToken(String.format("Number expected, got %s", sb.toString()));
+			addErrorToken(String.format("Number expected or exceeded 64 bit signed integer, got %s", sb.toString()));
 		}
 	}
 

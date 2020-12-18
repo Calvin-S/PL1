@@ -308,7 +308,7 @@ public class Interpreter {
 		Value index = evaluateExpr(b.getIndex());
 		if(index.getType().equals("int")) {
 			int actualIndex = (int) index.getInt(); 
-			if(actualIndex >= curList.size()) {
+			if(actualIndex >= curList.size() || actualIndex < 0) {
 				throw new EvaluationError("index out of bounds");
 			}
 			return curList.get(actualIndex);
@@ -348,7 +348,7 @@ public class Interpreter {
 				Value index = evaluateExpr(b.getIndex());
 				if(index.getType().equals("int")) {
 					int actualIndex = (int) index.getInt(); 
-					if(actualIndex >= curList.size()) {
+					if(actualIndex >= curList.size() || actualIndex < 0) {
 						throw new EvaluationError("index out of bounds");
 					}
 					curList.add(actualIndex, evaluateExpr(toInsert));
@@ -703,6 +703,18 @@ public class Interpreter {
 				return new Value(v1.getInt() != v2.getInt());
 			} else if (v1.getType().equals("string") && v2.getType().equals("string")) {
 				return new Value(!(v1.getString().equals(v2.getString())));
+			} else if (v1.getType().equals("list") && v2.getType().equals("list")) {
+				ArrayList<Value> list1 = v1.getList();
+				ArrayList<Value> list2 = v2.getList();
+
+				for (int i = 0; i < list1.size(); i++) {
+					if (!list1.get(i).equals(list2.get(i))) {
+						return new Value(true);
+					}
+				}
+
+				return new Value(false);
+
 			} else {
 				throw new EvaluationError("trying to != two things of different or invalid types");
 			}
