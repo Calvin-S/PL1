@@ -131,5 +131,36 @@ public class Value {
 		}
 	}
 
+	public boolean equals(Value other) {
+		if (this.getType().equals(other.getType())) {
+			if (this.getType().equals("int")) {
+				return this.getInt() == other.getInt();
+			} else if (this.getType().equals("string")) {
+				return this.getString().equals(other.getString());
+			} else if (this.getType().equals("bool")) {
+				return this.getBool() == other.getBool();
+			} else if (this.getType().equals("null")) {
+				return true;
+			} else if (this.getType().equals("list")) {
+				ArrayList<Value> list1 = this.getList();
+				ArrayList<Value> list2 = other.getList();
+
+				for (int i = 0; i < list1.size(); i++) {
+					if (!list1.get(i).equals(list2.get(i))) {
+						return false;
+					}
+				}
+
+				return true;
+			} else {
+				return false;
+			}
+
+		} else {
+			return false;
+		}
+
+	}
+
 
 }
