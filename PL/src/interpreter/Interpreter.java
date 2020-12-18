@@ -12,6 +12,7 @@ import ast.Fun;
 import ast.If;
 import ast.ListExpr;
 import ast.ListGet;
+import ast.ListSize;
 import ast.Match;
 import ast.Node;
 import ast.Null;
@@ -166,6 +167,22 @@ public class Interpreter {
 
 			ListExpr b = (ListExpr) n;
 			return evaluateListExpr(b);
+
+		} else if (n instanceof ListSize) {
+
+			ListSize b = (ListSize) n;
+
+			if (b.getList() == null) {
+				throw new EvaluationError("no list given");
+			}
+			Value cur_list = evaluateExpr(b.getList());
+			if (!cur_list.getType().equals("list")) {
+				throw new EvaluationError("trying to do a list operation on something that is not a list");
+			}
+
+			ArrayList<Value> curList = cur_list.getList();
+
+			return new Value(curList.size());
 
 		} else if (n instanceof StrExpr) {
 			StrExpr b = (StrExpr) n;
@@ -549,6 +566,16 @@ public class Interpreter {
 			} else {
 				throw new EvaluationError("trying to concatenate one or more things that are not strings/ints");
 			}
+		} else if (b.getOperator().equals("len")) {
+
+			Value v = evaluateExpr(b.getChildren().get(1));
+
+			if (v.getType().equals("string")) {
+				return new Value(v.getString().length());
+			} else {
+				throw new EvaluationError("calling reverse (~) on something that is not a string");
+			}
+
 		} else {
 			throw new EvaluationError("invalid operator");
 		}
