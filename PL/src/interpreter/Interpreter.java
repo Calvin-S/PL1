@@ -685,6 +685,18 @@ public class Interpreter {
 				return new Value(v1.getInt() == v2.getInt());
 			} else if (v1.getType().equals("string") && v2.getType().equals("string")) {
 				return new Value(v1.getString().equals(v2.getString()));
+			} else if (v1.getType().equals("list") && v2.getType().equals("list")) {
+				ArrayList<Value> list1 = v1.getList();
+				ArrayList<Value> list2 = v2.getList();
+
+				for (int i = 0; i < list1.size(); i++) {
+					if (!list1.get(i).equals(list2.get(i))) {
+						return new Value(false);
+					}
+				}
+
+				return new Value(true);
+
 			} else {
 				throw new EvaluationError("trying to == two things of different or invalid types");
 			}
