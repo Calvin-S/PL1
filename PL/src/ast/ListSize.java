@@ -7,6 +7,10 @@ public class ListSize extends Type{
 		this.l = l;
 	}
 
+	public Type getList() {
+		return l;
+	}
+
 	public String toString() {
 		return prettyPrint(new StringBuilder()).toString();
 	}
