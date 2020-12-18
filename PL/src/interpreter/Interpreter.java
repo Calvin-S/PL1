@@ -146,7 +146,13 @@ public class Interpreter {
 
 			ast.List r = (ast.List) n;
 			ArrayList<Expr> items = r.getValues();
-			return new Value(items, this); // Value with a list of exprs
+
+			ArrayList<Value> values = new ArrayList<Value>();
+
+			for (Expr item : items) {
+				values.add(evaluateExpr(item));
+			}
+			return new Value(values); // Value with a list of exprs
 
 		} else if (n instanceof BExpr) {
 
@@ -277,7 +283,7 @@ public class Interpreter {
 			throw new EvaluationError("trying to do a list operation on something that is not a list");
 		}
 		
-		ArrayList<Expr> curList= cur_list.getList();
+		ArrayList<Value> curList = cur_list.getList();
 		
 		if(b.getIndex() == null) {
 			throw new EvaluationError("no index given");
@@ -293,7 +299,7 @@ public class Interpreter {
 			max++;
 			if (max > 10)
 				throw new EvaluationError("boom");
-			return evaluateExpr(curList.get(actualIndex));
+			return curList.get(actualIndex);
 		} else {
 			throw new EvaluationError("index type is not an int");
 		}
@@ -309,23 +315,23 @@ public class Interpreter {
 			throw new EvaluationError("trying to do a list operation on something that is not a list");
 		}
 		
-		ArrayList<Expr> curList= cur_list.getList(); //list of exprs
+		ArrayList<Value> curList = cur_list.getList(); // list of exprs
 
 		
 		if (b.getOperator().equals("insert")){
 			if(b.getIndex() == null) {
 				Expr toInsert = b.getToInsert();
 				if(toInsert == null) { //don't insert anything
-					return new Value(curList, this);
+					return new Value(curList);
 				}
 				
-				curList.add(toInsert);
-				return new Value(curList, this);
+				curList.add(evaluateExpr(toInsert));
+				return new Value(curList);
 				
 			}else{
 				Expr toInsert = b.getToInsert();
 				if(toInsert == null) { //don't insert anything
-					return new Value(curList, this);
+					return new Value(curList);
 				}
 				
 				Value index = evaluateExpr(b.getIndex());
@@ -334,8 +340,8 @@ public class Interpreter {
 					if(actualIndex >= curList.size()) {
 						throw new EvaluationError("index out of bounds");
 					}
-					curList.add(actualIndex, toInsert);
-					return new Value(curList, this);
+					curList.add(actualIndex, evaluateExpr(toInsert));
+					return new Value(curList);
 				}else {
 					throw new EvaluationError("index type is not an int");
 				}
@@ -354,7 +360,7 @@ public class Interpreter {
 						throw new EvaluationError("index out of bounds");
 					}
 					curList.remove(actualIndex);
-					return new Value(curList, this);
+					return new Value(curList);
 				}else {
 					throw new EvaluationError("index type is not an int");
 				}
@@ -367,7 +373,7 @@ public class Interpreter {
 			}else{
 				Expr toReplace = b.getToInsert();
 				if(toReplace == null) { //don't replace anything
-					return new Value(curList, this);
+					return new Value(curList);
 				}
 				
 				Value index = evaluateExpr(b.getIndex());
@@ -376,8 +382,8 @@ public class Interpreter {
 					if(actualIndex >= curList.size()) {
 						throw new EvaluationError("index out of bounds");
 					}
-					curList.set(actualIndex, toReplace);
-					return new Value(curList, this);
+					curList.set(actualIndex, evaluateExpr(toReplace));
+					return new Value(curList);
 				}else {
 					throw new EvaluationError("index type is not an int");
 				}
