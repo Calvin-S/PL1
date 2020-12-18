@@ -137,47 +137,56 @@ The Program evaluates to
 ### Example 2
 ```
 $a = 0
+$c = "1"
 while ($a < 4) {
-
+$c = $c ^ $c
+// ^ is string concatenation
 }
 ```
 The Store evaluates to 
 ```
-a : 42
+a : 4
+c : ????????
 ```
 The Program evaluates to 
 
-    I am here
+    ????????
+## Functions and Calling Functions:
+### Example 1
+```
+fun double ($a) {$a = $a * 2}
+fun mul ($a, $b) {$a = $a * $b}
+$a = 2
+$b = @double($a)
+$c = @mul($a,$b)
+@double(@mul($a, $b))
+```
+The Store evaluates to 
+```
+a : 2
+b : 4
+c : 8
+```
+The Program evaluates to 
 
-## Example 3:
-Because our grammar is very structured, newlines, spaces, semicolons don't actually affect our parsing and interpreting. Thus the program:
+    16
+### Example 2
 ```
-34 + 20
-$c = 1
-$a = $b = F or ($c == 2)
-T or F
+$a = 0
+$c = "1"
+while ($a < 4) {
+$c = $c ^ $c
+// ^ is string concatenation
+}
 ```
-is equivalent to
+The Store evaluates to 
 ```
-34 + 20;
-$c = 1;;;
-$a = $b = F or ($c == 2);;;
-T or F;;;;;
+a : 4
+c : ????????
 ```
-which is equivalent to
-```
-34 + 20 $c = 1;$a = $b = F or ($c == 2)
-T or F
-```
-This Store evaluates to 
-```
-a : false
-b : false
-c : 1
-```
-The program evaluates to
+The Program evaluates to 
 
-    true
+    ????????
 ## Example 4: 
 Note that currently if statement branches can return different types:
 ```

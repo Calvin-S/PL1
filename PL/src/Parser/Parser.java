@@ -151,6 +151,8 @@ public class Parser{
 				if (t.peek().getType().equals(TokenType.STRING)) {
 					Str s = new Str(t.next().toStringToken().getValue());
 					((Call) e1).addArg(s);
+				} else if (t.peek().getType().equals(TokenType.LBRACKET)) {
+					((Call) e1).addArg(parseList(t));
 				} else {
 				((Call) e1).addArg(parseBExpr(t));
 				}
@@ -159,6 +161,8 @@ public class Parser{
 				if (t.peek().getType().equals(TokenType.STRING)) {
 					Str s = new Str(t.next().toStringToken().getValue());
 					((Call) e1).addArg(s);
+				} else if (t.peek().getType().equals(TokenType.LBRACKET)) {
+					((Call) e1).addArg(parseList(t));
 				} else {
 				Type temp = parseBExpr(t);
 				((Call) e1).addArg(temp);
@@ -190,8 +194,9 @@ public class Parser{
 				((Var) e1).setAsValue();
 				if (t.peek().getType().equals(TokenType.CONCAT))
 		        	e1 = parseStrExpr1(t, (Type)e1);
-		        else if (!t.peek().getType().equals(TokenType.NOT) && (t.peek().getType().category().equals(TC.BINOP) || t.peek().getType().category().equals(TC.BOP)))
+		        else if (!t.peek().getType().equals(TokenType.NOT) && (t.peek().getType().category().equals(TC.BINOP) || t.peek().getType().category().equals(TC.BOP))) {
 		        	e1 = parseBExpr1(t, (Type)e1);
+		        }
 			}
 		} else if (t.peek().getType().category().equals(TC.LIST)) {
 			e1 = parseListOp(t);
@@ -217,10 +222,14 @@ public class Parser{
 	
 	// Since Get and Remove have similar syntax, this can be used
 	public static Expr parseListHelper(Tokenizer t, ListOperator op) throws SyntaxError {
+		Expr e1;
 		consume(t, TokenType.LPAREN, "Expected right parenthesis for " + op);
 		Type l = parseList(t);
 		consume(t, TokenType.COMMA, "Expected comma in " + op + " syntax");
-		Expr e1 = new ListExpr(op, l, parseAExpr(t));
+		if (op.equals(ListOperator.GET))
+			e1 = new ListGet(l, parseAExpr(t));
+		else
+			e1 = new ListExpr(op, l, parseAExpr(t));
 		consume(t, TokenType.RPAREN, op + " method needs closing parenthesis");
 		return e1;
 	}
@@ -315,6 +324,7 @@ public class Parser{
 			consume(t, TokenType.LPAREN, "len method needs parenthesis");
 			s1 = new StrExpr(parseStr(t), ExprOperator.LEN);
 			consume(t, TokenType.RPAREN, "len method needs closing parenthesis");
+			s1 = parseAExpr(t, s1);
 		} else if (t.peek().isString()) {
 			s1 = new Str(t.next().toStringToken().getValue());
 		} else if (t.peek().getType().equals(TokenType.VAR)) {
@@ -388,7 +398,10 @@ public class Parser{
 			b1 = new Var(t.next().toVarToken().getValue(), null);
 			((Var) b1).setAsValue();
 			b1 = parseAExpr(t, b1);
-	    } else if (t.peek().getType().equals(TokenType.CALL)) {
+	    } else if (t.peek().getType().equals(TokenType.GET)) {
+			consume(t, TokenType.GET);
+			b1 = (Type) parseListHelper(t, ListOperator.GET);
+		} else if (t.peek().getType().equals(TokenType.CALL)) {
 			String f = t.next().toCallToken().getValue();
 			b1 = new Call(f);
 			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
@@ -524,8 +537,13 @@ public class Parser{
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
 			if (paren_count <= 0)
 				throw new SyntaxError("Parenthesis Mismatch on line " + t.lineNumber());
-		}
-		else if (t.peek().getType().equals(TokenType.PLUS)) {
+		} else if (t.peek().getType().equals(TokenType.TIMES)){
+			consume(t, TokenType.TIMES);
+			a1 = new AExpr(a1, ExprOperator.TIMES, parseAExpr(t));
+		} else if (t.peek().getType().equals(TokenType.DIVIDE)){
+			consume(t, TokenType.DIVIDE);
+			a1 = new AExpr(a1, ExprOperator.DIVIDE, parseAExpr(t));
+		} else if (t.peek().getType().equals(TokenType.PLUS)) {
 				consume(t, TokenType.PLUS);
 				a1 = new AExpr(a1, ExprOperator.PLUS, parseAExpr(t));
 		} else if (t.peek().getType().equals(TokenType.MINUS)){
@@ -553,7 +571,10 @@ public class Parser{
 	    } else if (t.peek().isVar()) {   
 			a1 = new Var(t.next().toVarToken().getValue(), null);
 			((Var) a1).setAsValue();
-	    } else if (t.peek().getType().equals(TokenType.CALL)) {
+	    } else if (t.peek().getType().equals(TokenType.GET)) {
+			consume(t, TokenType.GET);
+			a1 = (Type) parseListHelper(t, ListOperator.GET);
+		} else if (t.peek().getType().equals(TokenType.CALL)) {
 			String f = t.next().toCallToken().getValue();
 			a1 = new Call(f);
 			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
@@ -587,16 +608,9 @@ public class Parser{
 			a1 = new StrExpr(parseStr(t), ExprOperator.LEN);
 			consume(t, TokenType.RPAREN, "len method needs closing parenthesis");
 		} else{
+		  System.out.println("Parse failed on token " + t.peek());
 	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};
-		
-		if (t.peek().getType().equals(TokenType.TIMES)){
-			consume(t, TokenType.TIMES);
-			a1 = new AExpr(a1, ExprOperator.TIMES, parseAExprVal(t));
-		} else if (t.peek().getType().equals(TokenType.DIVIDE)){
-			consume(t, TokenType.DIVIDE);
-			a1 = new AExpr(a1, ExprOperator.DIVIDE, parseAExprVal(t));
-		}
 		return a1;
 	}
 

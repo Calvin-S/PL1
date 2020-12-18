@@ -11,6 +11,7 @@ import ast.Expr;
 import ast.Fun;
 import ast.If;
 import ast.ListExpr;
+import ast.ListGet;
 import ast.Match;
 import ast.Node;
 import ast.Null;
@@ -152,6 +153,9 @@ public class Interpreter {
 			BExpr b = (BExpr) n;
 			return evaluateBExpr(b);
 
+		} else if (n instanceof ListGet) {
+			ListGet b = (ListGet) n;
+			return evaluateListGet(b);
 		} else if (n instanceof ListExpr) {
 
 			ListExpr b = (ListExpr) n;
@@ -264,6 +268,37 @@ public class Interpreter {
 
 	}
 	
+	private Value evaluateListGet(ListGet b) throws EvaluationError{
+		if(b.getList() == null) {
+			throw new EvaluationError("no list given");
+		}
+		Value cur_list = evaluateExpr(b.getList());
+		if(!cur_list.getType().equals("list")) {
+			throw new EvaluationError("trying to do a list operation on something that is not a list");
+		}
+		
+		ArrayList<Expr> curList= cur_list.getList();
+		
+		if(b.getIndex() == null) {
+			throw new EvaluationError("no index given");
+		}
+		
+		Value index = evaluateExpr(b.getIndex());
+		if(index.getType().equals("int")) {
+			int actualIndex = (int) index.getInt(); 
+			if(actualIndex >= curList.size()) {
+				throw new EvaluationError("index out of bounds");
+			}
+			System.out.println(curList);
+			max++;
+			if (max > 10)
+				throw new EvaluationError("boom");
+			return evaluateExpr(curList.get(actualIndex));
+		} else {
+			throw new EvaluationError("index type is not an int");
+		}
+	}
+	public static int max = 0;
 	public Value evaluateListExpr(ListExpr b) throws EvaluationError {
 		
 		if(b.getList() == null) {
@@ -277,23 +312,7 @@ public class Interpreter {
 		ArrayList<Expr> curList= cur_list.getList(); //list of exprs
 
 		
-		if (b.getOperator().equals("get")) {
-			if(b.getIndex() == null) {
-				throw new EvaluationError("no index given");
-			}
-			
-			Value index = evaluateExpr(b.getIndex());
-			if(index.getType().equals("int")) {
-				int actualIndex = (int) index.getInt(); 
-				if(actualIndex >= curList.size()) {
-					throw new EvaluationError("index out of bounds");
-				}
-				return evaluateExpr(curList.get(actualIndex));
-			}else {
-				throw new EvaluationError("index type is not an int");
-			}
-			
-		}else if (b.getOperator().equals("insert")){
+		if (b.getOperator().equals("insert")){
 			if(b.getIndex() == null) {
 				Expr toInsert = b.getToInsert();
 				if(toInsert == null) { //don't insert anything
@@ -415,6 +434,7 @@ public class Interpreter {
 
 			if (r.getChild() != null) {
 				v = evaluateExpr(r.getChild());
+				System.out.println(v);
 				if (store.containsKey(r.getName())) {
 					store.put(r.getName(), v);
 				} else if (globalVars.containsKey(r.getName())){
@@ -571,7 +591,7 @@ public class Interpreter {
 
 			Value v1 = evaluateExpr(b.getChildren().get(0));
 			Value v2 = evaluateExpr(b.getChildren().get(1));
-
+			
 			if (v1.getType().equals("int") && v2.getType().equals("int")) {
 				return new Value(v1.getInt() * v2.getInt());
 			} else {

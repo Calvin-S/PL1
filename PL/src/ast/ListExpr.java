@@ -27,7 +27,7 @@ public class ListExpr extends Expr{
 		index = null;
 		value = null;
 	}
-	// For get and remove
+	// For remove
 	public ListExpr(ListOperator o, Type list, Expr index) {
 		operator = o;
 		this.index = index;

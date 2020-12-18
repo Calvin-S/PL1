@@ -1,1 +1,6 @@
-len("hi" ^ "hd" ^ "A" ^ ~ "blah" ^ "S")
+fun double ($a) {$a = $a * 2}
+fun mul ($a, $b) {$a = $a * $b}
+$a = 2
+$b = @double($a)
+$c = @mul($a,$b)
+@double(@mul($a, $b))
