@@ -295,16 +295,11 @@ public class Interpreter {
 			if(actualIndex >= curList.size()) {
 				throw new EvaluationError("index out of bounds");
 			}
-			System.out.println(curList);
-			max++;
-			if (max > 10)
-				throw new EvaluationError("boom");
 			return curList.get(actualIndex);
 		} else {
 			throw new EvaluationError("index type is not an int");
 		}
 	}
-	public static int max = 0;
 	public Value evaluateListExpr(ListExpr b) throws EvaluationError {
 		
 		if(b.getList() == null) {
@@ -440,7 +435,6 @@ public class Interpreter {
 
 			if (r.getChild() != null) {
 				v = evaluateExpr(r.getChild());
-				System.out.println(v);
 				if (store.containsKey(r.getName())) {
 					store.put(r.getName(), v);
 				} else if (globalVars.containsKey(r.getName())){
