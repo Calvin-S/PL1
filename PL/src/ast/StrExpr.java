@@ -9,8 +9,8 @@ public class StrExpr extends Type{
 	private ExprOperator operator;
 	private Type left, right;
 	
-	public StrExpr(Type rev) {
-		operator = ExprOperator.REV;
+	public StrExpr(Type rev, ExprOperator o) {
+		operator = o;
 		right = rev;
 		left = null;
 	}

@@ -1,2 +1,1 @@
-34 + 20 $c = 1;$a = $b = F or ($c == 2)
-T or F
+len("hi" ^ "hd" ^ "A" ^ ~ "blah" ^ "S")

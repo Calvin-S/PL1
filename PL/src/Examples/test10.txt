@@ -1,0 +1,6 @@
+fun isPalindrome($s) 
+{$s == (~$s)} 
+$e = "Hello World!"
+$e = $e ^ (~$e) 
+// ^ is the symbol for concatenation, and ~ is the symbol for string reversal
+$d = [@isPalindrome("noon"), @isPalindrome("hii"), @isPalindrome($e)]

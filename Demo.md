@@ -6,29 +6,51 @@ We attempting to implement a fully working language based off of our own designs
     - Types: ints, strings, booleans, lists
     - Conditional expressions: type matching, while loops, if-statements, etc.
     - Ability to call and define functions
+# Demo Code
+## Fibonacci Sequence:
+```
+// Hi, this is a single-line comment. Fibonacci is cool!
+fun fibb ($a)
+   {if ($a < 1) {0} 
+   elif ($a <= 2) {1} 
+   else { @fibb($a - 1) + @fibb($a - 2)}}
+$a = 13
+@fibb($a)
+```
+This programs evaluates to:
+```
+233
+```
+which is the correct value for the 13th number in the Fibonacci sequence.
 
-### Right Associativity
-Our parser parses binary operators right associatively if the order precedences are the same. Boolean operators have no order precedence yet. Multiplication and division have higher precedence than addition and subtraction.
+## Palindrome:
+```
+fun isPalindrome($s) 
+{$s == (~$s)} 
+$e = "Hello World!"
+$e = $e ^ (~$e) 
+// ^ is the symbol for concatenation. ~ is the symbol for string reversal
+$d = [@isPalindrome("noon"), @isPalindrome("hii"), @isPalindrome($e)]
+```
+This program evaluates to:
+```
+[true, false, true]
+```
 
-Examples of how our language interprets is shown below:
+## 
+# Syntax
+ Note the parenthesis is merely a substitute for the actual AST representation. It should also be noted that parser parses binary operators right associatively if order precedences are the same. Boolean operators have no order precedence. Basic arithmetic and boolean expression along with common errors during parsing and then evaluation shown below.
 ```
-not T or F --> not (T or F)
-T and (F or T) and F --> T and ((F or T) and F)
-4 + 2 - 3 + 1 --> 4 + (2 - (3 + 1))
-3 * 2 + 4 * 5 - 2 - 1 --> (3 * 2) + ((4 * 5) - (2 - 1))
-```
-In our language, T is for true and F for false.
-
-# Status
-Some examples of how files are parsed (including incorrect grammar) are shown below. Note the parenthesis is merely a substitute for the actual AST representation. Parsing and Interpreting for basic operations and basic errors:
-```
-T and (1 + 3) == 4 + 3 --> true and ((1 + 3) == (4 + 3))
+not T or F --> not (true or false) --> false
 ```
 ```
-3 * 4 + 2 - 1 + 0 --> 3 * (4 + (2 - (1 + 0)))
+T and (1 + 3) == 3 --> true and ((1 + 3) == 3) --> false
 ```
 ```
-2 * 2 * 2 + 2 * 2 * 2 --> ((2 * (2 * 2)) + (2 * (2 * 2))
+3 * 4 + 2 - 1 + 0 --> 3 * (4 + (2 - (1 + 0))) --> 13
+```
+```
+2 * 2 * 2 + 2 * 2 * 2 --> ((2 * (2 * 2)) + (2 * (2 * 2)) --> 16
 ```
 ```
 3 + T --> Parser.SyntaxError: Assigning Arithmetic Values failed on line 1
@@ -37,40 +59,96 @@ T and (1 + 3) == 4 + 3 --> true and ((1 + 3) == (4 + 3))
 F or T) --> Parser.SyntaxError: Parenthesis Mismatch
 ```
 
-Since project alpha, we have expanded our lexer and parser quite a bit, and if statements, while loops, basic expressions all work as well. More examples are listed below:
-## Example 1:
+A final note should be made that the syntax follows a rigid grammar, and thus separators for expressions can simply be whitespace or semicolon. For example all the below lines parse equivalently:
+```
+$a = 1 $b = 2
+```
+```
+$a=1;$b=2;
+```
+```
+$a=1
+$b=2
+```
+## Variable Assignment:
 ```
 $a = T
 $b = if ($a) {3}
 $c = "ASDF"
+$d = 3 + 2
+$e = $f = 0
 ```
 The Store evaluates to
 ```
 a : true
 b : 3
 c : ASDF
+d : 5
+e : 0
+f : 0
 ```
 The Program evaluates to
 
-    ASDF
-## Example 2:
-Since expressions return values, the last line really evaluates as $c = 2 first, which results in $a = $b = 2. This repeats leaving $a = 2 and finally returning 2.
+    0
+## If statements:
+### Example 1
 ```
-$c;
-$d;
-$c = 1
-$a = $b = $c = 2
+$c = if (T or F) {$a = 3 $b = 5}
 ```
 The Store evaluates to 
 ```
-a : 2
-b : 2
-c : 2
-d : NULL
+a : 3
+b : 5
+c : 5
 ```
 The Program evaluates to 
 
-    2
+    5
+### Example 2
+```
+$a = 42
+if (T and F) {$a = 3 $b = 5}
+elif (F) {$d = "hi"}
+elif (T) {"I am here"}
+else {$a}
+```
+The Store evaluates to 
+```
+a : 42
+```
+The Program evaluates to 
+
+    I am here
+
+## While loops:
+### Example 1
+```
+$a = "hi"
+$c = while ($a == "b") {$a = 3 $b = 5}
+```
+The Store evaluates to 
+```
+a : hi
+c : NULL
+```
+The Program evaluates to 
+
+    NULL
+### Example 2
+```
+$a = 0
+while ($a < 4) {
+
+}
+```
+The Store evaluates to 
+```
+a : 42
+```
+The Program evaluates to 
+
+    I am here
+
 ## Example 3:
 Because our grammar is very structured, newlines, spaces, semicolons don't actually affect our parsing and interpreting. Thus the program:
 ```

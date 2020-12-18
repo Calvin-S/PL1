@@ -194,15 +194,17 @@ public class Parser{
 		        	e1 = parseBExpr1(t, (Type)e1);
 			}
 		} else if (t.peek().getType().category().equals(TC.LIST)) {
-			e1 = parseListExpr(t);
+			e1 = parseListOp(t);
 	    } else if (t.peek().getType().equals(TokenType.LBRACKET)){
-			e1 = parseList(t);
+			e1 = parseListExpr(t);
 		} else if (t.peek().isBool() || t.peek().getType().equals(TokenType.NOT)) {
 	    	e1 = parseBExpr(t);
 	    } else if (t.peek().isNum()) {
 	    	e1 = parseAExpr(t);
 	    } else if (t.peek().isString() || t.peek().getType().equals(TokenType.REVERSE)) {
 	    	e1 = parseStrExpr(t);
+	    } else if (t.peek().getType().equals(TokenType.LEN)) {
+	    	e1 = parseStr(t);
 	    } else if (t.peek().isNull()) {
 	    	consume(t, TokenType.NULL);
 	    	e1 = new Null();
@@ -236,7 +238,8 @@ public class Parser{
 		consume(t, TokenType.RPAREN, op + " method needs closing parenthesis");
 		return e1;
 	}
-	public static Expr parseListExpr(Tokenizer t) throws SyntaxError {
+	
+	public static Expr parseListOp(Tokenizer t) throws SyntaxError {
 		Expr e1 =  null;
 		if (t.peek().getType().equals(TokenType.GET)) {
 			consume(t, TokenType.GET);
@@ -250,12 +253,20 @@ public class Parser{
 		} else if (t.peek().getType().equals(TokenType.REPLACE)) {
 			consume(t, TokenType.REPLACE);
 			e1 = parseListHelper1(t, ListOperator.REPLACE, true);
+		} else if (t.peek().getType().equals(TokenType.SIZE)) {
+			consume(t, TokenType.SIZE);
+			consume(t, TokenType.LPAREN, "size method needs parenthesis");
+			e1 = parseList(t);
+			e1 = new ListSize((Type)e1);
+			consume(t, TokenType.RPAREN, "size method needs closing parenthesis");
+			e1 = parseAExpr(t, (Type) e1);
 		} else {
 			throw new SyntaxError("Parser implementation error: failed to catch all TC.LIST types");
 		}
 		return e1;
 	}
 	
+	// Used for parsing one list
 	public static Type parseList(Tokenizer t) throws SyntaxError {
 		if (t.peek().getType().equals(TokenType.VAR)) {
 			Var v = new Var(t.next().toVarToken().getValue(), null);
@@ -277,7 +288,20 @@ public class Parser{
 		return l;
 	}
 	
-	public static Type parseStrExpr(Tokenizer t) throws SyntaxError {
+	// Might be a list or a BExpr
+	public static Type parseListExpr(Tokenizer t) throws SyntaxError {
+		Type l = parseList(t);
+		if (t.peek().getType().equals(TokenType.EQ)) {
+			consume (t, TokenType.EQ);
+			l = new BExpr(l, ExprOperator.EQ, parseList(t));
+		} else if (t.peek().getType().equals(TokenType.NEQ)) {
+			consume (t, TokenType.NEQ);
+			l = new BExpr(l, ExprOperator.NEQ, parseList(t));
+		}
+		return l;
+	}
+	
+	public static Type parseStr(Tokenizer t) throws SyntaxError {
 		Type s1;
 		if (t.peek().getType().equals(TokenType.LPAREN)) {
 			consume(t, TokenType.LPAREN);
@@ -285,7 +309,12 @@ public class Parser{
 	        consume(t, TokenType.RPAREN);
 		} else if (t.peek().getType().equals(TokenType.REVERSE)) {
 			consume(t, TokenType.REVERSE);
-			s1 = new StrExpr(parseStrExpr(t));
+			s1 = new StrExpr(parseStrExpr(t), ExprOperator.REV);
+		} else if (t.peek().getType().equals(TokenType.LEN)) {
+			consume(t, TokenType.LEN);
+			consume(t, TokenType.LPAREN, "len method needs parenthesis");
+			s1 = new StrExpr(parseStr(t), ExprOperator.LEN);
+			consume(t, TokenType.RPAREN, "len method needs closing parenthesis");
 		} else if (t.peek().isString()) {
 			s1 = new Str(t.next().toStringToken().getValue());
 		} else if (t.peek().getType().equals(TokenType.VAR)) {
@@ -294,9 +323,22 @@ public class Parser{
 		} else {
 			throw new SyntaxError("Assigning String failed on line " + t.lineNumber());
 		}
+		
 		if (t.peek().getType().equals(TokenType.CONCAT)) {
 			consume(t, TokenType.CONCAT);
 			s1 = new StrExpr(s1, ExprOperator.CONCAT, parseStrExpr(t));
+		}
+		return s1;
+	}
+	
+	public static Type parseStrExpr(Tokenizer t) throws SyntaxError {
+		Type s1 = parseStr(t);
+		if (t.peek().getType().equals(TokenType.EQ)) {
+			consume (t, TokenType.EQ);
+			s1 = new BExpr (s1, ExprOperator.EQ, parseStr(t));
+		} else if (t.peek().getType().equals(TokenType.NEQ)) {
+			consume (t, TokenType.NEQ);
+			s1 = new BExpr (s1, ExprOperator.NEQ, parseStr(t));
 		}
 		return s1;
 	}
@@ -306,6 +348,12 @@ public class Parser{
 		if (t.peek().getType().equals(TokenType.CONCAT)) {
 			consume(t, TokenType.CONCAT);
 			s1 = new StrExpr(s1, ExprOperator.CONCAT, parseStrExpr(t));
+		} else if (t.peek().getType().equals(TokenType.EQ)) {
+			consume (t, TokenType.EQ);
+			s1 = new BExpr (s1, ExprOperator.EQ, parseStr(t));
+		} else if (t.peek().getType().equals(TokenType.NEQ)) {
+			consume (t, TokenType.NEQ);
+			s1 = new BExpr (s1, ExprOperator.NEQ, parseStr(t));
 		}
 		return s1;
 	}
@@ -334,6 +382,8 @@ public class Parser{
 	    	b1 = new Null();
 	    } else if (t.peek().isNum()) {
 	    	b1 = parseAExpr(t);
+	    } else if (t.peek().isString() || t.peek().getType().equals(TokenType.REVERSE)) {
+	    	b1 = parseStrExpr(t);
 	    } else if (t.peek().isVar()) {
 			b1 = new Var(t.next().toVarToken().getValue(), null);
 			((Var) b1).setAsValue();
@@ -400,7 +450,6 @@ public class Parser{
 	
 	public static Type parseBExpr1(Tokenizer t, Type btemp) throws SyntaxError{
 		Type b1 = btemp;
-		
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
 			if (paren_count <= 0)
 				throw new SyntaxError("Parenthesis Mismatch");
@@ -526,7 +575,18 @@ public class Parser{
 				}
 			}
 			consume(t, TokenType.RPAREN, "Function calls needs closing parenthesis");
-	    } else{
+	    } else if (t.peek().getType().equals(TokenType.SIZE)) {
+			consume(t, TokenType.SIZE);
+			consume(t, TokenType.LPAREN, "size method needs parenthesis");
+			a1 = parseList(t);
+			a1 = new ListSize((Type)a1);
+			consume(t, TokenType.RPAREN, "size method needs closing parenthesis");
+		} else if (t.peek().getType().equals(TokenType.LEN)) {
+			consume(t, TokenType.LEN);
+			consume(t, TokenType.LPAREN, "len method needs parenthesis");
+			a1 = new StrExpr(parseStr(t), ExprOperator.LEN);
+			consume(t, TokenType.RPAREN, "len method needs closing parenthesis");
+		} else{
 	      throw new SyntaxError("Assigning Arithmetic Values failed on line " + t.lineNumber());
 		};
 		

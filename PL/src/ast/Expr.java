@@ -6,7 +6,7 @@ public class Expr extends Seq {
 		PLUS("+"), MINUS("-"), TIMES("*"), DIVIDE("/"), EXP("**"), 
 		AND("and"), OR("or"), NOT("not"), EQ("=="), NEQ("!="), 
 		GT(">"), LT("<"), GTE(">="), LTE("<="), 
-		REV("~"), CONCAT("^");
+		REV("~"), CONCAT("^"), LEN("len");
 
 		private final String stringRep;
 

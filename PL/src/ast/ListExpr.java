@@ -20,6 +20,13 @@ public class ListExpr extends Expr{
 	private Expr index;
 	private Expr value; // for when you insert something into list
 	
+	// For len
+	public ListExpr(ListOperator o, Type list) {
+		operator = o;
+		this.list = list;
+		index = null;
+		value = null;
+	}
 	// For get and remove
 	public ListExpr(ListOperator o, Type list, Expr index) {
 		operator = o;

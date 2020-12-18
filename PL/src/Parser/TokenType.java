@@ -24,6 +24,7 @@ public enum TokenType {
 	
 	REVERSE(TC.STRING, "rev"),
 	CONCAT(TC.STRING, "^"),
+	LEN(TC.STRING, "len"),
 	
 	STRING(TC.VALUES, "<str>"),
 	NUM(TC.VALUES, "<number>"),
@@ -53,6 +54,7 @@ public enum TokenType {
     REMOVE(TC.LIST, "remove"),
     GET(TC.LIST, "get"),
     REPLACE(TC.LIST, "replace"),
+    SIZE(TC.LIST, "size"),
     
     ASSIGN(TC.OTHER, "="),
     PERIOD(TC.OTHER, "."),

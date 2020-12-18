@@ -193,7 +193,7 @@ public class Tokenizer implements Iterator<Token> {
 			lexI();
 			break;
 		case 'l':
-			consume("ist", "Expected list", TokenType.LIST);
+			lexL();
 			break;
 		case 'm':
 			consume("atch", "Expected match", TokenType.MATCH);
@@ -208,7 +208,7 @@ public class Tokenizer implements Iterator<Token> {
 			lexR();
 			break;
 		case 's':
-			consume("tring", "Expected string", TokenType.STR);
+			lexS();
 			break;
 		case 'v':
 			lexVar(false);
@@ -291,7 +291,8 @@ public class Tokenizer implements Iterator<Token> {
 		if (!usingDollar)
 			consume("ar ", "Expected 'var [name]'");
 		String n = "";
-		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != '.' && in.peek() != ')' && in.peek() != ':' && in.peek() != '}' && in.peek() != ',') {
+		while (!Character.isWhitespace(in.peek()) && in.peek() != LookAheadBuffer.EOF && in.peek() != '.' && 
+				in.peek() != ')' && in.peek() != ':' && in.peek() != '}' && in.peek() != ','&& in.peek() != '=') {
 			n += Character.toString(in.next());
 		}
 		tokens.add(new Token.VarToken(n, lineNumber));
@@ -325,6 +326,22 @@ public class Tokenizer implements Iterator<Token> {
 		if (in.peek() == '"')
 			in.next();
 		tokens.add(new Token.StringToken(n, lineNumber));
+	}
+	
+	private void lexL() throws IOException {
+		if (in.peek() == 'i') {
+			consume("ist", "Expected list", TokenType.LIST);
+		}
+		else {
+			consume("en", "Expected len", TokenType.LEN);
+		}
+	}
+	
+	private void lexS() throws IOException {
+		if (in.peek() == 't')
+			consume("tring", "Expected string", TokenType.STR);
+		else
+			consume("ize", "Expected size", TokenType.SIZE);
 	}
 	
 	private void lexR() throws IOException {

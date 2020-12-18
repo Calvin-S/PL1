@@ -514,7 +514,6 @@ public class Interpreter {
 		} else if (b.getOperator().equals("^")) {
 			Value v1 = evaluateExpr(b.getChildren().get(0));
 			Value v2 = evaluateExpr(b.getChildren().get(1));
-			System.out.println(((Var)b.getChildren().get(1)).isValue());
 			if (v1.getType().equals("string") && v2.getType().equals("string")) {
 				return new Value(v1.getString() + v2.getString());
 			} else if (v1.getType().equals("string") && v2.getType().equals("int")) {

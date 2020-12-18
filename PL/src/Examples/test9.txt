@@ -1,4 +1,4 @@
-$x = T
+$x = [4,5,2,2]
 match $x : 
 int : $x + 1
 string : $x ^ $x
