@@ -390,7 +390,7 @@ public class Parser{
 	    } else if (t.peek().isNull()) {
 	    	consume(t, TokenType.NULL);
 	    	b1 = new Null();
-	    } else if (t.peek().isNum()) {
+	    } else if (t.peek().isNum() || t.peek().getType().equals(TokenType.SIZE)) {
 	    	b1 = parseAExpr(t);
 	    } else if (t.peek().isString() || t.peek().getType().equals(TokenType.REVERSE)) {
 	    	b1 = parseStrExpr(t);

@@ -181,7 +181,6 @@ public class Interpreter {
 			}
 
 			ArrayList<Value> curList = cur_list.getList();
-
 			return new Value(curList.size());
 
 		} else if (n instanceof StrExpr) {

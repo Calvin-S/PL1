@@ -74,8 +74,8 @@ $b=2
 ```
 $a = T
 $b = if ($a) {3}
-$c = "ASDF"
-$d = 3 + 2
+var c = "ASDF"
+var d = 3 + 2
 $e = $f = 0
 ```
 The Store evaluates to
@@ -137,20 +137,22 @@ The Program evaluates to
 ### Example 2
 ```
 $a = 0
-$c = "1"
-while ($a < 4) {
+$c = "hi"
+while ($a < 3) {
 $c = $c ^ $c
+$a = $a + 1
 // ^ is string concatenation
 }
+$c
 ```
 The Store evaluates to 
 ```
-a : 4
-c : ????????
+a : 3
+c : hihihihihihihihi
 ```
 The Program evaluates to 
 
-    ????????
+    hihihihihihihihi
 ## Functions and Calling Functions:
 ### Example 1
 ```
@@ -172,39 +174,88 @@ The Program evaluates to
     16
 ### Example 2
 ```
-$a = 0
-$c = "1"
-while ($a < 4) {
-$c = $c ^ $c
-// ^ is string concatenation
+fun doubleList ($list) { 
+	$a = 0
+	while ($a < size($list)) {
+		$b = 2*get($list,$a)
+		replace($list, $b, $a)
+		$a = $a + 1
+		$list
+	}
 }
+@doubleList ([1,2,3,4,5,6])
 ```
-The Store evaluates to 
+The Store is empty.
+
+The Program evaluates to 
+
+    [2, 4, 6, 8, 10, 12]
+## Global Variables:
+To declare a global variable 'x'. We can do as shown below (both are syntactically equivalent), we can have a global variable even in functions:
 ```
-a : 4
-c : ????????
+$x.
+```
+or
+```
+var x.
+```
+### Example 1
+```
+fun add($b) {$x = $x + $b}
+var x.
+$x = 0
+@add(3)
+$x
+```
+The (Global) Store evaluates to 
+```
+x : 3
 ```
 The Program evaluates to 
 
-    ????????
-## Example 4: 
-Note that currently if statement branches can return different types:
+    3
+### Example 2
 ```
-$a = T
-$b = if (3 < 1) {F}
-elif (not $a) {0}
-elif (F) {2}
-elif ((1 != 2) and 2 == 2) {"hi"}
-else {"no"}
+fun doubleList ($list) { 
+	$a = 0
+	while ($a < size($list)) {
+		$b = 2*get($list,$a)
+		replace($list, $b, $a)
+		$a = $a + 1
+		$list
+	}
+}
+@doubleList ([1,2,3,4,5,6])
 ```
-The Store evaluates to:
-```
-a : true
-b : hi
-```
-The Program evaulates to: 
+The Store is empty.
 
-    hi
+The Program evaluates to 
+
+    [2, 4, 6, 8, 10, 12]
+### Example 3
+Our language does not support function arguments sharing names with global variables.
+```
+fun add($x) {$x = $x + $b}
+var x.
+$x = 0
+@add(3)
+$x
+```
+This will throw the error:
+```
+interpreter.EvaluationError: The function's parameters overlap with existing global variables
+```
+Similarly:
+```
+fun add($x) {$x. $x = $x + $b}
+$x = 0
+@add(3)
+$x
+```
+Throws the same error:
+```
+interpreter.EvaluationError: The function's parameters overlap with existing global variables
+```
 
 ## Example 5: 
 Programs with multiple expressions will evaluate to the last expression:

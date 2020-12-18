@@ -1,11 +1,10 @@
-fun doubleFirstThree ($list) { 
+fun doubleList ($list) { 
 	$a = 0
 	while ($a < size($list)) {
 		$b = 2*get($list,$a)
 		replace($list, $b, $a)
 		$a = $a + 1
-		"ASD" != "ASD"
 		$list
 	}
 }
-@doubleFirstThree ([1,2,3,4,5,6])
+@doubleList ([1,2,3,4,5,6])

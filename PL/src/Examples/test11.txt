@@ -1,0 +1,4 @@
+fun add($x) {$x. $x = $x + $b}
+$x = 0
+@add(3)
+$x
