@@ -29,33 +29,28 @@ public class Interpreter {
 	static HashMap<String, Value> globalVars = new HashMap<String, Value>();
 
 	private HashMap<String, Value> store = null;
-	private HashMap<String, Fun> functions = null;
+	private static HashMap<String, Fun> functions = null;
 	private HashMap<String, Boolean> params = null;
 
 	public Interpreter() {
 		store = new HashMap<String, Value>();
-		functions = new HashMap<String, Fun>();
+		if (functions == null)
+			functions = new HashMap<String, Fun>();
 		params = new HashMap<String, Boolean>();
 	}
-
-//	public Interpreter(HashMap<String, Value> parameters) {
-//		store = new HashMap<String, Value>();
-//		functions = new HashMap<String, Fun>();
-//		for (String key : parameters.keySet()) {
-//			store.put(key, parameters.get(key));
-//		}
-//	}
 	
 	public Interpreter(HashMap<String, Value> parameters, Fun fun) {
 		store = new HashMap<String, Value>();
-		functions = new HashMap<String, Fun>();
+		if (functions == null)
+			functions = new HashMap<String, Fun>();
 		params = new HashMap<String, Boolean>();
 
 		for (String key : parameters.keySet()) {
 			store.put(key, parameters.get(key));
 			params.put(key, false);
 		}
-		functions.put(fun.getName(), fun);
+		if (functions == null)
+			functions.put(fun.getName(), fun);
 
 	}
 
@@ -216,7 +211,6 @@ public class Interpreter {
 			List<ast.Type> args = r.getArguments();
 			
 			Fun fun = functions.get(funName);
-			
 			if(fun == null){
 				throw new EvaluationError("You are trying to call a function that has not been defined");
 			}

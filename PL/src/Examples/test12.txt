@@ -1,0 +1,23 @@
+fun reverseList($l) {
+$i = size($l) - 1
+$newList = []
+	while ($i >= 0) {
+		insert($newList, get($l, $i))
+		$i = $i - 1
+	}
+	$newList
+}
+fun modify($x) {
+match $x :
+	string : ~$x
+	list : @reverseList($x)
+	bool : if ($x) {[T,T]} else {[F,F]}
+	null : "null"
+}
+$masterList = [1, "hi", [1,2,3], T, null]
+$i = 0
+while ($i < size($masterList)) {
+replace( $masterList, @modify(get($masterList, $i)), $i)
+$i = $i + 1
+}
+$masterList

@@ -10,7 +10,6 @@ public enum TokenType {
     MINUS(TC.BINOP, "-"),
 	TIMES(TC.BINOP, "*"),
 	DIVIDE(TC.BINOP, "/"),
-	EXP(TC.BINOP, "**"),
 	
 	LT(TC.BOP, "<"),
 	GT(TC.BOP, ">"),

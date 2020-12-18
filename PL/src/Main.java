@@ -14,7 +14,7 @@ import interpreter.Value;
 public class Main {
 	public static void main(String args[]) {
 		
-		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test11.txt");
+		InputStream in = ClassLoader.getSystemResourceAsStream("Examples/test12.txt");
 		Reader r = new BufferedReader(new InputStreamReader(in));
 
 		Parser parser = new Parser();

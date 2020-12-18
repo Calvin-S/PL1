@@ -153,7 +153,7 @@ public class Parser{
 			String f = t.next().toCallToken().getValue();
 			e1 = new Call(f);
 			consume(t, TokenType.LPAREN, "Function calls needs parenthesis");
-			if (!t.peek().getType().equals(TokenType.RPAREN))
+			if (!t.peek().getType().equals(TokenType.RPAREN)) {
 				if (t.peek().getType().equals(TokenType.STRING)) {
 					Str s = new Str(t.next().toStringToken().getValue());
 					((Call) e1).addArg(s);
@@ -162,6 +162,7 @@ public class Parser{
 				} else {
 				((Call) e1).addArg(parseBExpr(t));
 				}
+			}
 			while (t.peek().getType().equals(TokenType.COMMA)) {
 				consume(t, TokenType.COMMA, "Function arguments should be separated by comma");
 				if (t.peek().getType().equals(TokenType.STRING)) {
@@ -531,10 +532,7 @@ public class Parser{
 		} else if (t.peek().getType().equals(TokenType.MINUS)){
 				consume(t, TokenType.MINUS);
 				a1 = new AExpr(a1, ExprOperator.MINUS, parseAExpr(t));
-		} else if (t.peek().getType().equals(TokenType.EXP)){
-		  consume(t, TokenType.EXP);
-				a1 = new AExpr(a1, ExprOperator.EXP, parseAExpr(t));
-		} 
+		}
 	    return a1;
 	  }
 	
@@ -555,10 +553,7 @@ public class Parser{
 		} else if (t.peek().getType().equals(TokenType.MINUS)){
 				consume(t, TokenType.MINUS);
 				a1 = new AExpr(a1, ExprOperator.MINUS, parseAExpr(t));
-		} else if (t.peek().getType().equals(TokenType.EXP)){
-		  consume(t, TokenType.EXP);
-				a1 = new AExpr(a1, ExprOperator.EXP, parseAExpr(t));
-		} 
+		}
 	    return a1;
 	  }
 	
@@ -643,7 +638,7 @@ public class Parser{
 		if (t.peek().getType().equals(tt)) {
 			t.next();
 		} else
-			throw new SyntaxError("Syntax error on consuming "+ t.peek().getType() + " Expected " + tt.name());
+			throw new SyntaxError("Syntax error on consuming "+ t.peek().getType() + " Expected " + tt.name() + " on line number " + t.lineNumber());
 	}
 	
 	public static void consume(Tokenizer t, TokenType tt, String err) throws SyntaxError {

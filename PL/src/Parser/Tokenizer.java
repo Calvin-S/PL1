@@ -406,8 +406,9 @@ public class Tokenizer implements Iterator<Token> {
 				in.next();
 			if (in.peek() == 't')
 				consume('t', TokenType.INT);
-			else 
+			else {
 				consume("sert", "Expected Insert", TokenType.INSERT);
+			}
 		}
 	}
 	
