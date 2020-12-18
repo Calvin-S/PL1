@@ -29,15 +29,48 @@ fun isPalindrome($s)
 {$s == (~$s)} 
 $e = "Hello World!"
 $e = $e ^ (~$e) 
-// ^ is the symbol for concatenation. ~ is the symbol for string reversal
+// ^ is the symbol for concatenation. 
+// ~ is the symbol for string reversal
 $d = [@isPalindrome("noon"), @isPalindrome("hii"), @isPalindrome($e)]
 ```
 This program evaluates to:
 ```
 [true, false, true]
 ```
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
 
-## 
+## Some function that modifies masterList according to its type
+```
+fun reverseList($l) {
+$i = size($l) - 1
+$newList = []
+	while ($i >= 0) {
+		insert($newList, get($l, $i))
+		$i = $i - 1
+	}
+	$newList
+}
+fun modify($x) {
+match $x :
+	string : ~$x
+	list : @reverseList($x)
+	bool : if ($x) {[T,T]} else {[F,F]}
+	null : "no"
+}
+$masterList = [1, "hi", [1,2,3], T, null]
+$i = 0
+while ($i < size($masterList)) {
+replace( $masterList, @modify(get($masterList, $i)), $i)
+$i = $i + 1
+}
+$masterList
+```
+This program evaluates to:
+```
+[NULL, ih, [3, 2, 1], [true, true], no]
+```
 # Syntax
  Note the parenthesis is merely a substitute for the actual AST representation. It should also be noted that parser parses binary operators right associatively if order precedences are the same. Boolean operators have no order precedence. Since we wrote the parser from scratch, we can give syntax-specific errors to the user.
 ```
@@ -64,6 +97,9 @@ $a=1;$b=2;
 $a=1
 $b=2
 ```
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
 ## Basic Expressions on Types:
 --> denotes evaluation by our parser
 ### Booleans
@@ -120,6 +156,9 @@ Common Errors:
 
 len("a b" --> Parser.SyntaxError: len method needs closing parenthesis on line number 1
 ```
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
 ### Lists
 Lists are dynamically typed, so we can put anything inside, although expressions will be evaluated to a value. There are five main built-in functions on lists on top of declaration.
 ```
@@ -287,6 +326,9 @@ The Store is empty.
 The Program evaluates to 
 
     [2, 4, 6, 8, 10, 12]
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
 ## Global Variables:
 To declare a global variable 'x'. We can do as shown below (both are syntactically equivalent), we can have a global variable even in functions:
 ```

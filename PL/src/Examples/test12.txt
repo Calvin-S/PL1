@@ -12,7 +12,7 @@ match $x :
 	string : ~$x
 	list : @reverseList($x)
 	bool : if ($x) {[T,T]} else {[F,F]}
-	null : "null"
+	null : "no"
 }
 $masterList = [1, "hi", [1,2,3], T, null]
 $i = 0
