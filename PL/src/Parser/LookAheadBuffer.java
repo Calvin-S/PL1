@@ -15,27 +15,9 @@ public class LookAheadBuffer {
     LookAheadBuffer(int capacity, Reader in) {
         this.capacity = capacity;
         this.in = in;
-        buf = new char[capacity + 1]; // need one more than capacity
+        buf = new char[capacity + 1]; 
     }
     
-    /**
-     * @param c - character where we want to stop reading to
-     * @return the string from the Reader until we hit 'c'
-     * @throws IOException
-     */
-//    public StringBuilder nextUntil(char c) throws IOException, ParseError {
-//    	StringBuilder sb = new StringBuilder();
-//    	char reading = next();
-//    	while (reading != c) {
-//    		sb.append(reading);
-//    		reading = next();
-//    		if (next() == EOF)
-//    			throw new ParseError ("Unmatched character " + c);
-//    	}
-//    	sb.append(c);
-//    	return sb;
-//    }
-
     public char next() throws IOException {
         if (!empty()) return pop();
         int r = in.read();
