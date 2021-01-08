@@ -37,9 +37,6 @@ This program evaluates to:
 ```
 [true, false, true]
 ```
-<div style="page-break-after: always; visibility: hidden"> 
-\pagebreak 
-</div>
 
 ## Some function that modifies masterList according to its type
 ```
@@ -97,9 +94,6 @@ $a=1;$b=2;
 $a=1
 $b=2
 ```
-<div style="page-break-after: always; visibility: hidden"> 
-\pagebreak 
-</div>
 ## Basic Expressions on Types:
 --> denotes evaluation by our parser
 ### Booleans
@@ -156,9 +150,7 @@ Common Errors:
 
 len("a b" --> Parser.SyntaxError: len method needs closing parenthesis on line number 1
 ```
-<div style="page-break-after: always; visibility: hidden"> 
-\pagebreak 
-</div>
+
 ### Lists
 Lists are dynamically typed, so we can put anything inside, although expressions will be evaluated to a value. There are five main built-in functions on lists on top of declaration.
 ```
@@ -326,9 +318,7 @@ The Store is empty.
 The Program evaluates to 
 
     [2, 4, 6, 8, 10, 12]
-<div style="page-break-after: always; visibility: hidden"> 
-\pagebreak 
-</div>
+
 ## Global Variables:
 To declare a global variable 'x'. We can do as shown below (both are syntactically equivalent), we can have a global variable even in functions:
 ```
