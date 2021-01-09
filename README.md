@@ -1,4 +1,4 @@
-# Our language
+# PL-1
 We attempting to implement a fully working language based off of our own designs. We will start from pretty much scratch and build a lexer, parser, and evaluater for this language. Our language implementation is a true blend of imperative and functional programming languages. All statements such as If-statements and While-loops are considered expressions, and thus these statements can be assigned to variables. 
 
 ## Core features:
