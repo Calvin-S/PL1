@@ -18,52 +18,41 @@ public class LookAheadBuffer {
         buf = new char[capacity + 1]; 
     }
     
-    public char next() throws IOException {
-        if (!empty()) return pop();
-        int r = in.read();
-        return r == -1 ? EOF : (char) r;
+    public char next() throws IOException{
+    	if (size() != 0) return pop();
+    	int c = in.read();
+    	return c == -1 ? EOF : (char)c;
     }
-
-    public char peek(int n) throws IOException {
-        assert n < capacity;
-        while (size() <= n) {
+    
+    public char peek(int n) throws IOException{
+    	while (size() <= n) {
             int r = in.read();
-            push(r == -1 ? EOF : (char) r);
+            char c = r == -1 ? EOF : (char) r;
+            push(c);
         }
         return buf[(hd + n) % buf.length];
     }
-
+    
     public char peek() throws IOException {
-        return peek(0);
+    	return peek(0);
     }
-
-    private int size() {
-        return (tl - hd + buf.length) % buf.length;
+    
+    private int size() throws IOException {
+    	return (tl - hd + buf.length) % buf.length;
     }
-
+    
     public char scanAndPeek() throws IOException {
-        next();
-        return peek();
+    	next();
+    	return peek();
     }
-
-	boolean empty() {
-        return size() == 0;
-    }
-
-    private boolean full() {
-        return size() == capacity;
-    }
-
+    
     private void push(char c) {
-        assert !full();
-        buf[tl++] = c;
-        tl %= buf.length;
+    	buf[tl] = c;
+    	tl = (tl + 1) % buf.length;
     }
-
     private char pop() {
-        assert !empty();
-        char c = buf[hd++];
-        hd %= buf.length;
-        return c;
+    	char popped = buf[hd];
+    	hd = (hd + 1) % buf.length;
+    	return popped;
     }
 }

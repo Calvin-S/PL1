@@ -43,6 +43,12 @@ public class Parser{
 		}
 		return p1;
 	}
+	/**
+	 * Lexes a functions according to its grammar rules
+	 * @param t Tokenizer
+	 * @return function that is parsed
+	 * @throws SyntaxError
+	 */
 	public static Fun parseFun(Tokenizer t) throws SyntaxError {
 		Fun f1;
 		if (t.peek().getType().equals(TokenType.FUN)) {
@@ -72,6 +78,13 @@ public class Parser{
 		}
 		return f1;
 	}
+	
+	/**
+	 * Lexes a sequence of expression according to grammar rules
+	 * @param t Tokenizer
+	 * @return Sequence of expression that is parsed
+	 * @throws SyntaxError
+	 */
 	public static Seq parseSeq(Tokenizer t) throws SyntaxError {
 		Seq s1 = new Seq();
 		s1.addToSeq(parseExpr(t));
@@ -82,6 +95,13 @@ public class Parser{
 		return s1;
 	}
 	
+	/**
+	 * Lexes a sequence of expression according to grammar rules, used for while/If bodies
+	 * to stop parsing on char '}'
+	 * @param t Tokenizer
+	 * @return Sequence of expression parsed until either lexing '}' or 'EOF'
+	 * @throws SyntaxError
+	 */
 	public static Seq parseSeqCond(Tokenizer t) throws SyntaxError {
 		Seq s1 = new Seq();
 		s1.addToSeq(parseExpr(t));
@@ -90,7 +110,12 @@ public class Parser{
 		}
 		return s1;
 	}
-	
+	/**
+	 * Parses an expression according to grammar rules
+	 * @param t Tokenizer
+	 * @return Expression that is parsed
+	 * @throws SyntaxError
+	 */
 	public static Expr parseExpr(Tokenizer t) throws SyntaxError {
 		Expr e1;
 		if (t.peek().getType().equals(TokenType.SEMICOLON)) {
@@ -255,6 +280,12 @@ public class Parser{
 		return e1;
 	}
 	
+	/**
+	 * Parses Lists and List operators expressions
+	 * @param t Tokenizer
+	 * @return expression that handles lists and list operations
+	 * @throws SyntaxError
+	 */
 	public static Expr parseListOp(Tokenizer t) throws SyntaxError {
 		Expr e1 =  null;
 		if (t.peek().getType().equals(TokenType.GET)) {
@@ -282,7 +313,12 @@ public class Parser{
 		return e1;
 	}
 	
-	// Used for parsing one list
+	/**
+	 * Parses one list
+	 * @param t Tokenizer
+	 * @return a list that is parsed
+	 * @throws SyntaxError
+	 */
 	public static Type parseList(Tokenizer t) throws SyntaxError {
 		if (t.peek().getType().equals(TokenType.VAR)) {
 			Var v = new Var(t.next().toVarToken().getValue(), null);
@@ -304,7 +340,13 @@ public class Parser{
 		return l;
 	}
 	
-	// Might be a list or a BExpr
+	/**
+	 * Parses a ListExpression, which might be a list or a BExpr (boolean expression)
+	 * as the langauge can compare lists.
+	 * @param t Tokenizer
+	 * @return Either a list or BExpr depending on what is parsed
+	 * @throws SyntaxError
+	 */
 	public static Type parseListExpr(Tokenizer t) throws SyntaxError {
 		Type l = parseList(t);
 		if (t.peek().getType().equals(TokenType.EQ)) {
@@ -348,6 +390,12 @@ public class Parser{
 		return s1;
 	}
 	
+	/**
+	 * Parses string operations or strings
+	 * @param t Tokenizer
+	 * @return Type String
+	 * @throws SyntaxError
+	 */
 	public static Type parseStrExpr(Tokenizer t) throws SyntaxError {
 		Type s1 = parseStr(t);
 		if (t.peek().getType().equals(TokenType.EQ)) {
@@ -467,7 +515,14 @@ public class Parser{
 		}
 	    return b1;
 	  }
-	
+	/**
+	 * Parse Boolean expressions based on grammar rules where a previous value is already set to allow right-recursive parsing
+	 * e.g. parsing T and T and T -> btemp = T, Tokenizer has (and T and T) -> btemp = (T and T), Tokenizer has (T)
+	 * @param t Tokenizer
+	 * @param btemp previous Boolean expression value
+	 * @return boolean type parsed
+	 * @throws SyntaxError
+	 */
 	public static Type parseBExpr1(Tokenizer t, Type btemp) throws SyntaxError{
 		Type b1 = btemp;
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
@@ -509,7 +564,12 @@ public class Parser{
 			throw new SyntaxError("Failed assigning booleans on logical operators (perhaps add parenthesis) on line " + t.lineNumber());
 		return b1;
 	}
-	
+	/**
+	 * Parses arithmetic expression
+	 * @param t Tokenizer
+	 * @return Arithmetic Type parsed
+	 * @throws SyntaxError
+	 */
 	public static Type parseAExpr(Tokenizer t) throws SyntaxError{
 		Type a1 = parseAExprVal(t);
 		
@@ -535,7 +595,13 @@ public class Parser{
 		}
 	    return a1;
 	  }
-	
+	/**
+	 * Similar to parseBExpr1, but for arithmetic expressions
+	 * @param t Tokenizer
+	 * @param b previous arithmetic value parsed
+	 * @return parsed Arithemtic expression
+	 * @throws SyntaxError
+	 */
 	public static Type parseAExpr(Tokenizer t, Type b) throws SyntaxError{
 		Type a1 = b;
 		if (t.peek().getType().equals(TokenType.RPAREN)) {
@@ -556,7 +622,12 @@ public class Parser{
 		}
 	    return a1;
 	  }
-	
+	/**
+	 * Parses an arithmetic value, either a number, var, list get, etc.
+	 * @param t Tokenizer
+	 * @return parsed arithmetic value
+	 * @throws SyntaxError
+	 */
 	public static Type parseAExprVal(Tokenizer t) throws SyntaxError{
 		Type a1;
 		if(t.peek().getType().equals(TokenType.LPAREN)){
@@ -640,7 +711,11 @@ public class Parser{
 		} else
 			throw new SyntaxError("Syntax error on consuming "+ t.peek().getType() + " Expected " + tt.name() + " on line number " + t.lineNumber());
 	}
-	
+	/**
+	 * Consumes a token of the expected type. 
+	 *
+	 * @throws SyntaxError with string err if the wrong kind of token is encountered.
+	 */
 	public static void consume(Tokenizer t, TokenType tt, String err) throws SyntaxError {
 		if (t.peek().getType().equals(TokenType.ERROR))
 			System.out.println(t.peek());

@@ -67,9 +67,8 @@ class Token {
     boolean isCall() {
     	return type == TokenType.CALL;
     }
+    
     /**
-     * Returns the number token associated with this Token.
-     *
      * @return The number token associated with this token.
      * @throws InputMismatchException if this token is not of number type
      */
@@ -113,20 +112,18 @@ class Token {
         return type.toString();
     }
 
-    /** A NumToken is a token containing a number. */
+    /** A NumToken contains a number. */
     static class NumToken extends Token {
 
-        /** The int value this token represents. */
         private final long value;
 
         /**
-         * Constructs a new {@code NumToken} representing the integer value {@code v} on line {@code
-         * lineNum}.
+         * Represents the integer value {@code v} on line {@code lineNum}.
          *
          * @param v the integer value this token represents
          * @param lineNum The line number in the input file containing this token. Checks {@code
          *     lineNum > 0}. Note that a {@code NumToken} is not an error token, so the line number
-         *     must be positive.
+         *     must be positive. (The same applies for the rest of the Tokens)
          */
         NumToken(long v, int lineNum) {
             super(TokenType.NUM, lineNum);
@@ -135,8 +132,6 @@ class Token {
         }
 
         /**
-         * Returns the value of the number this token represents.
-         *
          * @return the value of the number this token represents
          */
         long getValue() {
@@ -155,25 +150,18 @@ class Token {
         private final String value;
 
         /**
-         * Constructs a new {@code NumToken} representing the String value {@code v} on line {@code
+         * Constructs a new {@code StringToken} representing the String value {@code v} on line {@code
          * lineNum}.
          *
          * @param v the String value this token represents
-         * @param lineNum The line number in the input file containing this token. Checks {@code
-         *     lineNum > 0}. Note that a {@code StringToken} is not an error token, so the line number
-         *     must be positive.
+         * @param lineNum {@link NumToken}
          */
         StringToken(String v, int lineNum) {
             super(TokenType.STRING, lineNum);
             assert lineNum > 0 : "StringToken line number must be positive.";
             value = v;
         }
-
-        /**
-         * Returns the value of the number this token represents.
-         *
-         * @return the value of the number this token represents
-         */
+        
         String getValue() {
             return value;
         }
@@ -186,17 +174,13 @@ class Token {
     
     static class VarToken extends Token {
 
-        /** The string value this token represents. */
         private final String value;
 
         /**
-         * Constructs a new {@code NumToken} representing the String value {@code v} on line {@code
-         * lineNum}.
+         * Represents the Variable value {@code v} on line {@code lineNum}.
          *
-         * @param v the String value this token represents
-         * @param lineNum The line number in the input file containing this token. Checks {@code
-         *     lineNum > 0}. Note that a {@code StringToken} is not an error token, so the line number
-         *     must be positive.
+         * @param v the var value this token represents
+         * @param lineNum {@link NumToken}
          */
         VarToken(String v, int lineNum) {
             super(TokenType.VAR, lineNum);
@@ -205,8 +189,6 @@ class Token {
         }
 
         /**
-         * Returns the value of the number this token represents.
-         *
          * @return the value of the number this token represents
          */
         String getValue() {
@@ -225,17 +207,14 @@ class Token {
         private final String value;
 
         /**
-         * Constructs a new {@code NumToken} representing the String value {@code v} on line {@code
-         * lineNum}.
+         * Represents the String value {@code v} on line {@code lineNum}.
          *
          * @param v the String value this token represents
-         * @param lineNum The line number in the input file containing this token. Checks {@code
-         *     lineNum > 0}. Note that a {@code StringToken} is not an error token, so the line number
-         *     must be positive.
+         * @param lineNum {@link NumToken}
          */
         FunToken(String v, int lineNum) {
             super(TokenType.FUN, lineNum);
-            assert lineNum > 0 : "VarToken line number must be positive.";
+            assert lineNum > 0 : "FunToken line number must be positive.";
             value = v;
         }
 
@@ -260,23 +239,21 @@ class Token {
         private final String value;
 
         /**
-         * Constructs a new {@code NumToken} representing the String value {@code v} on line {@code
+         * Constructs a new {@code CallToken} representing calling another function {@code v} on line {@code
          * lineNum}.
          *
-         * @param v the String value this token represents
+         * @param v the Call value this token represents
          * @param lineNum The line number in the input file containing this token. Checks {@code
-         *     lineNum > 0}. Note that a {@code StringToken} is not an error token, so the line number
+         *     lineNum > 0}. Note that a {@code CallToken} is not an error token, so the line number
          *     must be positive.
          */
         CallToken(String v, int lineNum) {
             super(TokenType.CALL, lineNum);
-            assert lineNum > 0 : "VarToken line number must be positive.";
+            assert lineNum > 0 : "CallToken line number must be positive.";
             value = v;
         }
 
         /**
-         * Returns the value of the number this token represents.
-         *
          * @return the value of the number this token represents
          */
         String getValue() {
@@ -289,7 +266,6 @@ class Token {
         }
     }
 
-    /** Helper class to represent an end of file token. */
     static class EOFToken extends Token {
 
         /** Contents of the string builder at the time the EOF was encountered. */
@@ -297,12 +273,10 @@ class Token {
 
         /**
          * Constructs a new {@code EOFToken} at line {@code lineNum} containing the contents of the
-         * string builder when the EOF was encountered.
+         * string builder when reached EOF
          *
-         * @param sbContents contents of the string builder at the time the EOF was encountered
-         * @param lineNum The line number in the input file containing this token. Checks {@code
-         *     lineNum > 0}. Note that an {@code EOFToken} is not an error token, so the line number
-         *     must be positive.
+         * @param sbContents contents of the string builder when reached EOF
+         * @param lineNum {@link NumToken}
          */
         EOFToken(String sbContents, int lineNum) {
             super(TokenType.EOF, lineNum);
@@ -310,11 +284,6 @@ class Token {
             builderContents = sbContents;
         }
 
-        /**
-         * Returns the contents of the string builder when the EOF was encountered.
-         *
-         * @return the contents of the string builder when the EOF was encountered
-         */
         String getBufferContents() {
             return builderContents;
         }
@@ -325,10 +294,8 @@ class Token {
         }
     }
 
-    /** Helper class to represent an error token. */
     static class ErrorToken extends Token {
 
-        /** String value stored by this error token. */
         private final String value;
 
         /**
@@ -340,12 +307,7 @@ class Token {
             super(TokenType.ERROR, lineNum);
             value = v;
         }
-
-        /**
-         * Returns the string value stored by this error token.
-         *
-         * @return the string value stored by this error token
-         */
+        
         String getValue() {
             return value;
         }

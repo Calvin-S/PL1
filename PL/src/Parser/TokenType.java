@@ -79,19 +79,10 @@ public enum TokenType {
         stringToTypeMap = Collections.unmodifiableMap(temp);
     }
 
-    /** The category of this TokenType. */
     private final TC category;
 
-    /** String representation of this TokenType. */
     private final String stringRep;
 
-    /**
-     * Constructs a new {@code TokenType} with category {@code cat} and string representation {@code
-     * s}.
-     *
-     * @param tcat token category, checks {@code tcat != null}
-     * @param s string representation of this token, check {@code s != null}
-     */
     private TokenType(TC tcat, String s) {
         assert tcat != null : "TokenType must have a category";
         assert s != null : "TokenType must have a string representation";
@@ -99,27 +90,10 @@ public enum TokenType {
         stringRep = s;
     }
 
-    /**
-     * Returns this {@code TokenType}'s category.
-     * @return this {@code TokenType}'s category
-     */
-    public TC category() {
-        return category;
-    }
+    public TC category() {return category;}
 
-    /**
-     * Returns the {@code TokenType} that is represented by the string {@code rep}.
-     *
-     * @param rep the string representing the {@code TokenType}, checks {@code rep} indeed
-     *     represents a valid {@code TokenType}
-     * @return the {@code TokenType} represented by the string {@code rep}
-     */
-    public static TokenType getTypeFromString(String rep) {
-        return stringToTypeMap.get(rep);
-    }
+    public static TokenType getTypeFromString(String rep) {return stringToTypeMap.get(rep);}
 
     @Override
-    public String toString() {
-        return stringRep;
-    }
+    public String toString() {return stringRep;}
 }

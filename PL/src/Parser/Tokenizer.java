@@ -244,7 +244,6 @@ public class Tokenizer implements Iterator<Token> {
 	
 	private void consume(String next, String error, TokenType peeked) throws IOException {
 		int index = 0;
-		boolean matched = false;
 		while (index < next.length()) {
 			if ( next.charAt(index) != in.peek(index++)) {
 				addErrorToken(String.format(error));
@@ -355,6 +354,11 @@ public class Tokenizer implements Iterator<Token> {
 		else 
 			consume("place", "Expected replace", TokenType.REPLACE);
 	}
+	/**
+	 * Lexes 'n'. May be null or not
+	 * @throws IOException if an IOException was thrown when trying to read from the
+	 *                     source Reader
+	 */
 	private void lexN() throws IOException {
 		if (in.peek() == 'o')
 			consume("ot", "Expected not", TokenType.NOT);
@@ -383,8 +387,7 @@ public class Tokenizer implements Iterator<Token> {
 	}
 
 	/**
-	 * Lexes '<'. May be called only when the previously read character is '<'. May
-	 * be either '<' or '<='.
+	 * Lexes '<'. May be either '<' or '<='.
 	 *
 	 * @throws IOException if an IOException was thrown when trying to read from the
 	 *                     source Reader
@@ -425,8 +428,7 @@ public class Tokenizer implements Iterator<Token> {
 	}
 
 	/**
-	 * Lexes '>'. May be called only when the previously read character is '>'. May
-	 * be either '>' or '>='.
+	 * Lexes '>'. May be either '>' or '>='.
 	 *
 	 * @throws IOException if an IOException was thrown when trying to read from the
 	 *                     source Reader
@@ -441,8 +443,7 @@ public class Tokenizer implements Iterator<Token> {
 	}
 
 	/**
-	 * Lexes a number. May be called only when the previously read character is a
-	 * digit. Scans the number and produces a number token.
+	 * Lexes a number. Scans the number and produces a number token.
 	 *
 	 * @throws IOException if an IOException was thrown when trying to read from the
 	 *                     source Reader
